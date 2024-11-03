@@ -19,6 +19,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private static String name;
     private static String groupID;
+    private static String userID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
    //logs in with provided credentials
-   void login(String username, String password) {
+   void login (String username, String password) {
         mAuth.signInWithEmailAndPassword(username, password)
                 .addOnCompleteListener(login -> {
             if (login.isSuccessful()) {
@@ -68,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                             DocumentSnapshot document = getUser.getResult();
                             if (document.exists()) {
                                 Log.d("getUser", "DocumentSnapshot data: " + document.getData());
+                                userID = uID;
                                 name = document.getString("name");
                                 groupID = document.getString("groupID");
                                 Log.d("getUser", groupID + " " + name);
@@ -85,5 +92,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    //Joins a group by groupID
+    void joinGroup (String groupJoinID) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("groupID", "groupJoinID");
+        db.collection("Users").document(userID)
+                .set(data, SetOptions.merge());
+    }
 }
+
 
