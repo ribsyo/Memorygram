@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.cmpt.memogram" />
+                  <option name="mobileSdkAppId" value="1:450449777874:android:4a99d109bc384b14e6390b" />
+                  <option name="projectId" value="memorygram-1b8ca" />
+                  <option name="projectNumber" value="450449777874" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
