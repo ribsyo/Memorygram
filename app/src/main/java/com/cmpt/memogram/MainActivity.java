@@ -1,5 +1,6 @@
 package com.cmpt.memogram;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,8 +21,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    private static FirebaseAuth mAuth;
-    static FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ActivityMainBinding binding;
     private static String name;
     private static String groupID;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
    //logs in with provided credentials
-    static void login (String username, String password) {
+   void login(String username, String password) {
         mAuth.signInWithEmailAndPassword(username, password)
                 .addOnCompleteListener(login -> {
             if (login.isSuccessful()) {
