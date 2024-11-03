@@ -5,6 +5,8 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/loginFragment">
 
+
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.cmpt.memogram.ui.home.HomeFragment"
@@ -15,8 +17,17 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.cmpt.memogram.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
+        <action
+            android:id="@+id/action_navigation_dashboard_to_createPostFragment"
+            app:destination="@id/createPostFragment" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/createPostFragment"
+        android:name="com.cmpt.memogram.ui.sampledata.CreatePostFragment"
+        android:label="Create Post"
+        tools:layout="@layout/fragment_createpost" />
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.cmpt.memogram.ui.notifications.NotificationsFragment"
