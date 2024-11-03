@@ -20,11 +20,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static FirebaseAuth mAuth;
+    static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ActivityMainBinding binding;
-    private String name;
-    private String groupID;
+    private static String name;
+    private static String groupID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,41 +46,43 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
     }
-
     public void onStart() {
         super.onStart();
-        //Currently hardcoded to login with test user
-        mAuth.signInWithEmailAndPassword("test@test.ca", "PW12345")
-                .addOnCompleteListener(this, login -> {
-                    if (login.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("login", "loginWithEmail:success");
+        login("test@test.ca", "PW12345");
+    }
 
-                        FirebaseUser currentUser = mAuth.getCurrentUser();
-                        if(currentUser != null){
-                            String uID = currentUser.getUid();
-                            DocumentReference docRef = db.collection("Users").document(uID);
-                            docRef.get().addOnCompleteListener(getUser -> {
-                                if (getUser.isSuccessful()) {
-                                    DocumentSnapshot document = getUser.getResult();
-                                    if (document.exists()) {
-                                        Log.d("getUser", "DocumentSnapshot data: " + document.getData());
-                                        name = document.getString("name");
-                                        groupID = document.getString("groupID");
-                                        Log.d("getUser", groupID + " " + name);
-                                    } else {
-                                        Log.d("getUser", "No such document");
-                                    }
-                                } else {
-                                    Log.d("getUser", "get failed with ", getUser.getException());
-                                }
-                            });
-
+   //logs in with provided credentials
+    static void login (String username, String password) {
+        mAuth.signInWithEmailAndPassword(username, password)
+                .addOnCompleteListener(login -> {
+            if (login.isSuccessful()) {
+                // Sign in success, updates app variables with user info
+                Log.d("login", "loginWithEmail:success");
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                if(currentUser != null){
+                    String uID = currentUser.getUid();
+                    DocumentReference docRef = db.collection("Users").document(uID);
+                    docRef.get().addOnCompleteListener(getUser -> {
+                        if (getUser.isSuccessful()) {
+                            DocumentSnapshot document = getUser.getResult();
+                            if (document.exists()) {
+                                Log.d("getUser", "DocumentSnapshot data: " + document.getData());
+                                name = document.getString("name");
+                                groupID = document.getString("groupID");
+                                Log.d("getUser", groupID + " " + name);
+                            } else {
+                                Log.d("getUser", "No such document");
+                            }
+                        } else {
+                            Log.d("getUser", "get failed with ", getUser.getException());
                         }
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("login", "loginUserWithEmail:failure", login.getException());
-                    }
-                });
+                    });
+                }
+            } else {
+                // If sign in fails, display a message to the user.
+                Log.w("login", "loginUserWithEmail:failure", login.getException());
+            }
+        });
     }
 }
+
