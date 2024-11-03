@@ -1,10 +1,8 @@
 package com.cmpt.memogram;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 
-
+import com.cmpt.memogram.classes.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,30 +12,15 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.cmpt.memogram.databinding.ActivityMainBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ActivityMainBinding binding;
-    private static String name;
-    private static String groupID;
-    private static String userID;
+    private static final User user = new User();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mAuth = FirebaseAuth.getInstance();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -55,49 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void onStart() {
         super.onStart();
-        login("test@test.ca", "PW12345");
-    }
-
-   //logs in with provided credentials
-   void login (String username, String password) {
-        mAuth.signInWithEmailAndPassword(username, password)
-                .addOnCompleteListener(login -> {
-            if (login.isSuccessful()) {
-                // Sign in success, updates app variables with user info
-                Log.d("login", "loginWithEmail:success");
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if(currentUser != null){
-                    String uID = currentUser.getUid();
-                    DocumentReference docRef = db.collection("Users").document(uID);
-                    docRef.get().addOnCompleteListener(getUser -> {
-                        if (getUser.isSuccessful()) {
-                            DocumentSnapshot document = getUser.getResult();
-                            if (document.exists()) {
-                                Log.d("getUser", "DocumentSnapshot data: " + document.getData());
-                                userID = uID;
-                                name = document.getString("name");
-                                groupID = document.getString("groupID");
-                                Log.d("getUser", groupID + " " + name);
-                            } else {
-                                Log.d("getUser", "No such document");
-                            }
-                        } else {
-                            Log.d("getUser", "get failed with ", getUser.getException());
-                        }
-                    });
-                }
-            } else {
-                // If sign in fails, display a message to the user.
-                Log.w("login", "loginUserWithEmail:failure", login.getException());
-            }
-        });
-    }
-    //Joins a group by groupID
-    void joinGroup (String groupJoinID) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("groupID", "groupJoinID");
-        db.collection("Users").document(userID)
-                .set(data, SetOptions.merge());
+        user.login("test@test.ca", "PW12345");
     }
 }
 
