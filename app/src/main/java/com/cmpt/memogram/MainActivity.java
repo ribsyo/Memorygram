@@ -22,8 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
-import java.util.Objects;
-
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private static final User user = new User();
@@ -32,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Objects.requireNonNull(getSupportActionBar()).hide();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         reload();
@@ -55,4 +52,5 @@ public class MainActivity extends AppCompatActivity {
         user.login("test@test.ca", "PW12345");
     }
 }
+
 
