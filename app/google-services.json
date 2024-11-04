@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "450449777874",
+    "project_id": "memorygram-1b8ca",
+    "storage_bucket": "memorygram-1b8ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450449777874:android:f7776f56e63a6264e6390b",
+        "android_client_info": {
+          "package_name": "com.cmpt.memogram"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHtYd8o9QD1qtpNFRS5RnidtH09hLRjDw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450449777874:android:4a99d109bc384b14e6390b",
+        "android_client_info": {
+          "package_name": "com.sixid.memorygram"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHtYd8o9QD1qtpNFRS5RnidtH09hLRjDw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
