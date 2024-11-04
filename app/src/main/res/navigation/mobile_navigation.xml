@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/loginFragment">
-
-
+    app:startDestination="@+id/navigation_home">
 
     <fragment
         android:id="@+id/navigation_home"
@@ -17,29 +15,11 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.cmpt.memogram.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard">
-        <action
-            android:id="@+id/action_navigation_dashboard_to_createPostFragment"
-            app:destination="@id/createPostFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_dashboard" />
 
-    <fragment
-        android:id="@+id/createPostFragment"
-        android:name="com.cmpt.memogram.ui.sampledata.CreatePostFragment"
-        android:label="Create Post"
-        tools:layout="@layout/fragment_createpost" />
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.cmpt.memogram.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
-
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.cmpt.memogram.ui.login.LoginFragment"
-        android:label="LoginFragment">
-        <action
-            android:id="@+id/action_loginFragment_to_navigation_home"
-            app:destination="@id/navigation_home" />
-    </fragment>
 </navigation>
