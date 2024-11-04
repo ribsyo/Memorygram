@@ -28,15 +28,15 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private static final User user = new User();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Objects.requireNonNull(getSupportActionBar()).hide();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot()); // Ensure the correct layout is set
         reload();
     }
-   
+
     public void reload() {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -47,11 +47,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-
     }
+
+    @Override
     public void onStart() {
         super.onStart();
         user.login("test@test.ca", "PW12345");
     }
 }
-
