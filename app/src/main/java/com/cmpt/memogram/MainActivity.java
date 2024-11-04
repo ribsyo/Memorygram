@@ -32,34 +32,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        reload();
     }
-    public void onStart() {
-        super.onStart();
-        mAuth.signInWithEmailAndPassword("test@test.ca", "PW12345")
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("login", "loginWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("login", "loginUserWithEmail:failure", task.getException());
-                }
-            }
-        });;
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            setContentView(binding.getRoot());
-            reload();
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseStorage sr = FirebaseStorage.getInstance();
-
-    }
+   
     public void reload() {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
