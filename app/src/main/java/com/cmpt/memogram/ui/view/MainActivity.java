@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.ui.login.LoginFragment;
 import com.cmpt.memogram.ui.settings.SettingsFragment;
 import com.cmpt.memogram.ui.post.CreatePostFragment;
 
@@ -24,12 +25,17 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
 
+        // Load LoginFragment initially
+        if (savedInstanceState == null) {
+            replaceFragment(new LoginFragment(), false);
+        }
+
         // Check for button clicks
         ImageButton settingsButton = findViewById(R.id.settings_btn);
         settingsButton.setOnClickListener(v -> {
             // Replace the current fragment with SettingsFragment
             SettingsFragment settingsFragment = new SettingsFragment();
-            replaceFragment(settingsFragment);
+            replaceFragment(settingsFragment, true);
         });
 
         // Set up the post button
@@ -37,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         postButton.setOnClickListener(v -> {
             // Replace the current fragment with CreatePostFragment
             CreatePostFragment createPostFragment = new CreatePostFragment();
-            replaceFragment(createPostFragment);
+            replaceFragment(createPostFragment, true);
         });
 
         // Add a back stack change listener to handle top block visibility
@@ -64,14 +70,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void replaceFragment(Fragment fragment) {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Clear the back stack
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    private void replaceFragment(Fragment fragment, boolean addToBackStack) {
         // Hide the top block layout
         findViewById(R.id.top_block).setVisibility(View.GONE);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
+        if (addToBackStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
         fragmentTransaction.commit();
     }
 }
