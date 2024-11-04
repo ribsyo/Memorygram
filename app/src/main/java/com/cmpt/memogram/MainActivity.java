@@ -3,6 +3,7 @@ package com.cmpt.memogram;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.cmpt.memogram.classes.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
