@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">Memogram</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="view_collection">View Collection</string>
+    <string name="post">Post</string>
+
+    <!-- Strings used for settings_layout.xml  -->
+    <string name="settings">SETTINGS</string>
+    <string name="greater_than">></string>"
+    <string name="generate_one_time_code">GENERATE ONE-TIME CODE</string>
+    <string name="manage_family">MANAGE FAMILY</string>
+    <string name="leave_family">LEAVE FAMILY GROUP</string>
+
+    <!-- Strings used for post_layout.xml  -->
+    <string name="create_post">CREATE POST</string>
+    <string name="upload_image">Upload an image</string>
+    <string name="write_caption">Write a caption...</string>
+    <string name="add_tags">Add tags</string>
+    <string name="audio">Audio</string>
+    <string name="play_back">Play Back</string>
 </resources>
