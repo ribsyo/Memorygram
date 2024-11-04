@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -56,6 +58,7 @@ public class PostManager {
 
     }
 
+
     //private method to map document data to a post object
     private Post toPost(DocumentSnapshot dr){
         Post post = new Post();
@@ -68,8 +71,22 @@ public class PostManager {
     }
 
     //returns byte array of media given firebase storage path
-    public byte[] getMedia(){
-        return null;
+    public void getMedia(String path, final OnGetBytesListener listener){
+        ;
+        final long ONE_MEGABYTE = 1024 * 1024;
+        sr.child(path).getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                // Data for "images/island.jpg" is returns, use this as needed
+                listener.onSuccess(bytes);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });
+
     }
 }
 
