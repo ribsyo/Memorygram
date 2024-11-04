@@ -55,46 +55,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseStorage sr = FirebaseStorage.getInstance();;
-
-        //creates a post manager instance on startup
-        PostManager pm = new PostManager(db, sr, "testGroup");
-
-        //get post function demo
-        pm.getPost("testPost", new OnGetPostListener() {
-            @Override
-            public void onSuccess(Post post) {
-                System.out.println(post.title);
-                System.out.println(post.text);
-                System.out.println(post.audioPath);
-                System.out.println(post.imagePath);
-                System.out.println(post.datePosted);
-
-                pm.getMedia(post.imagePath, new OnGetBytesListener() {
-                    @Override
-                    public void onSuccess(byte[] data) {
-                        System.out.println("Image retrieved");
-                        System.out.println(data);
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        //getting data failed
-                    }
-                });
-            }
-
-
-
-            @Override
-            public void onFailure() {
-                //getting post failed
-            }
-
-        });
-
-
-
+        FirebaseStorage sr = FirebaseStorage.getInstance();
 
     }
     public void reload() {
