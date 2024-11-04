@@ -22,8 +22,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
     private ActivityMainBinding binding;
+    private static final User user = new User();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-    }
 
+    }
+    public void onStart() {
+        super.onStart();
+        user.login("test@test.ca", "PW12345");
+    }
 }
+
+
