@@ -1,7 +1,4 @@
-package com.cmpt.memogram;
-
-import java.sql.Date;
-import java.sql.Timestamp;
+package com.cmpt.memogram.classes;
 
 public class Post {
     public String title;
