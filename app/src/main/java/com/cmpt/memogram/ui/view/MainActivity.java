@@ -1,4 +1,4 @@
-package com.cmpt.memogram.ui;
+package com.cmpt.memogram.ui.view;
 
 import android.os.Bundle;
 import android.view.MenuItem;

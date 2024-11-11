@@ -11,8 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cmpt.memogram.R;
-import com.cmpt.memogram.ui.adapter.PostAdapter;
-import com.cmpt.memogram.ui.model.Post;
+
+import com.cmpt.memogram.classes.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +25,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private PostAdapter postAdapter;
+    // private PostAdapter postAdapter;
     private List<Post> postLists;
 
     private List<String> followingList;
@@ -43,8 +43,8 @@ public class HomeFragment extends Fragment {
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         postLists = new ArrayList<>();
-        postAdapter = new PostAdapter(getContext(), postLists);
-        recyclerView.setAdapter(postAdapter);
+        // postAdapter = new PostAdapter(getContext(), postLists);
+        // recyclerView.setAdapter(postAdapter);
 
         return view;
     }
@@ -59,12 +59,12 @@ public class HomeFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Post post = snapshot.getValue(Post.class);
                     for (String id : followingList) {
-                        if (post.getPublisher().equals(id)) {
-                            postLists.add(post);
-                        }
+                        //if (post.getPublisher().equals(id)) {
+                        //    postLists.add(post);
+                        //}
                     }
                 }
-                postAdapter.notifyDataSetChanged();
+                //postAdapter.notifyDataSetChanged();
             }
 
             @Override
