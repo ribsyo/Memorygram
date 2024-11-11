@@ -1,4 +1,4 @@
-package com.cmpt.memogram.ui.login;
+package com.cmpt.memogram.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

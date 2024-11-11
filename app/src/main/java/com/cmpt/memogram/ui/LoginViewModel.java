@@ -1,4 +1,4 @@
-package com.cmpt.memogram.ui.login;
+package com.cmpt.memogram.ui;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
