@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cmpt.memogram.R;
-
+import com.cmpt.memogram.adapter.PostAdapter;
 import com.cmpt.memogram.classes.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +25,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    // private PostAdapter postAdapter;
+    private PostAdapter postAdapter;
     private List<Post> postLists;
 
     private List<String> followingList;
@@ -43,34 +43,45 @@ public class HomeFragment extends Fragment {
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         postLists = new ArrayList<>();
-        // postAdapter = new PostAdapter(getContext(), postLists);
-        // recyclerView.setAdapter(postAdapter);
+
+        // Initialize a sample Post object
+        Post samplePost1 = new Post("cayden_yoo_trip_to_hawaii/trip_to_hawaii_description.txt", "cayden_yoo_trip_to_hawaii/maui.jpg", "cayden_yoo_trip_to_hawaii/title.txt");
+        postLists.add(samplePost1);
+        Post samplePost2 = new Post("cayden_yoo_trip_to_hawaii/trip_to_hawaii_description.txt", "cayden_yoo_trip_to_hawaii/maui.jpg", "cayden_yoo_trip_to_hawaii/title.txt");
+        postLists.add(samplePost2);
+        Post samplePost3 = new Post("cayden_yoo_trip_to_hawaii/trip_to_hawaii_description.txt", "cayden_yoo_trip_to_hawaii/maui.jpg", "cayden_yoo_trip_to_hawaii/title.txt");
+        postLists.add(samplePost3);
+
+        postAdapter = new PostAdapter(getContext(), postLists);
+        recyclerView.setAdapter(postAdapter);
+
+        // readPosts();
 
         return view;
     }
 
-    private void readPosts() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                postLists.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Post post = snapshot.getValue(Post.class);
-                    for (String id : followingList) {
-                        //if (post.getPublisher().equals(id)) {
-                        //    postLists.add(post);
-                        //}
-                    }
-                }
-                //postAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
+//    private void readPosts() {
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+//
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                postLists.clear();
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Post post = snapshot.getValue(Post.class);
+//                    for (String id : followingList) {
+//                        //if (post.getPublisher().equals(id)) {
+//                        //    postLists.add(post);
+//                        //}
+//                    }
+//                }
+//                postAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 }

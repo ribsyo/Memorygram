@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.fragment.HomeFragment"
+    android:layout_marginTop="65dp"
     android:background="@color/grey">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -11,28 +12,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/bar"
         android:background="?android:attr/windowBackground">
-
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="65dp"
-            android:backgroundTint="@color/red"
-            android:id="@+id/toolbar"
-            android:background="?android:attr/windowBackground">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="view collection"/>
-
-            </RelativeLayout>
-
-        </androidx.appcompat.widget.Toolbar>
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -40,5 +19,4 @@
         android:layout_height="match_parent"
         android:layout_below="@id/bar"
         android:id="@+id/recycler_view"/>
-
 </RelativeLayout>

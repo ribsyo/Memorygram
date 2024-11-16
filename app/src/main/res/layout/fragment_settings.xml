@@ -56,6 +56,16 @@
             android:text="generate one time code"
             android:textColor="@color/blue" />
 
+        <!-- Edit Profile Button  -->
+        <Button
+            android:id="@+id/edit_profile_btn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/white"
+            android:text="edit profile"
+            android:textColor="@color/blue" />
+
         <!-- Manage Family Button  -->
         <Button
             android:id="@+id/manage_family_btn"

@@ -5,14 +5,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/white">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="10dp"
@@ -24,12 +25,45 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/username"
                 android:layout_gravity="center_vertical"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/blue"
                 android:text="username"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey"
+                android:text="◦"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_date"
+                android:layout_gravity="center_vertical"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey"
+                android:text="posted 2 hours ago"/>
+
         </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/title"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:text="Title"/>
 
         <ImageView
             android:layout_width="match_parent"
@@ -37,64 +71,54 @@
             android:id="@+id/post_image"
             android:src="@mipmap/cat"/>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:id="@+id/like"
-                android:src="@drawable/ic_like"/>
+            <Button
+                android:id="@+id/play_audio"
+                android:textSize="12sp"
+                android:layout_marginTop="10dp"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="7.5dp"
+                android:backgroundTint="@color/blue"
+                android:text="Play Audio"
+                android:paddingHorizontal="50dp"
+                android:drawablePadding="8dp"/>
 
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:id="@+id/comment"
-                android:src="@drawable/ic_comment"
-                android:layout_toEndOf="@id/like"
-                android:layout_marginStart="10dp"/>
-
-        </RelativeLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textStyle="bold"
-            android:id="@+id/likes"
-            android:text="10 likes"
-            android:textColor="@color/colorPrimaryDark"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textStyle="bold"
-            android:id="@+id/publisher"
-            android:text="username"
-            android:textColor="@color/colorPrimaryDark"/>
+            <Button
+                android:id="@+id/tag"
+                android:textSize="12sp"
+                android:layout_marginTop="10dp"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="7.5dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/blue"
+                android:text="Tag"/>
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:textStyle="bold"
             android:id="@+id/description"
             android:text="description"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:textColor="@color/black"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"
-            android:id="@+id/comments"
-            android:text="View All 20 Comments"
-            android:textColor="@color/colorAccent"/>
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:orientation="horizontal"
+            android:background="@color/grey"/>
     </LinearLayout>
 
 </RelativeLayout>
