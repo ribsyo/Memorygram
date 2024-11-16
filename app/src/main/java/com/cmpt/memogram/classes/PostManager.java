@@ -6,6 +6,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -13,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -21,11 +25,11 @@ public class PostManager {
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private StorageReference sr;
-    PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg){
+    public PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg){
         this.db = db;
         this.fg = fg;
         this.fs = fs;
-        this.sr = fs.getReference();
+        this.sr = this.fs.getReference();
     }
 
     //returns post and calls a callback function once post is generated
@@ -41,14 +45,46 @@ public class PostManager {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         post = toPost(document);
+
+                        Post finalPost = post;
+                        //get image
+                        getMedia(finalPost.imagePath, new OnGetFileListener() {
+                            @Override
+                            public void onSuccess(File imageFile) {
+                                finalPost.localImagePath = imageFile.getAbsolutePath();
+
+                                //get audio
+                                getMedia(finalPost.audioPath, new OnGetFileListener() {
+                                    @Override
+                                    public void onSuccess(File audiuoFile) {
+                                        finalPost.localAudioPath = imageFile.getAbsolutePath();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        // Handle the failure
+                                        listener.onFailure();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                // Handle the failure
+                                listener.onFailure();
+                            }
+                        });
+                        listener.onSuccess(post);
                     } else {
                         Log.d(TAG, "No such document");
+                        listener.onFailure();
                     }
 
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
+                    listener.onFailure();
                 }
-                listener.onSuccess(post);
+
             }
         });
 
@@ -67,23 +103,30 @@ public class PostManager {
         return post;
     }
 
-    //returns byte array of media given firebase storage path
-    public void getMedia(String path, final OnGetBytesListener listener){
-        ;
-        final long ONE_MEGABYTE = 1024 * 1024;
-        sr.child(path).getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                // Data for "images/island.jpg" is returns, use this as needed
-                listener.onSuccess(bytes);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-            }
-        });
 
+
+    public void getMedia(String path, final OnGetFileListener listener) {
+        try {
+            // Create a temporary file
+            File localFile = File.createTempFile("media", null);
+
+            sr.child(path).getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    // File downloaded successfully
+                    listener.onSuccess(localFile);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    listener.onFailure();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            listener.onFailure();
+        }
     }
 }
 
