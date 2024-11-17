@@ -1,7 +1,4 @@
-package com.cmpt.memogram;
-
-import java.sql.Date;
-import java.sql.Timestamp;
+package com.cmpt.memogram.classes;
 
 public class Post {
     public String title;
@@ -9,7 +6,6 @@ public class Post {
     public String audioPath;
     public String localAudioPath;
     public String imagePath;
-
     public String localImagePath;
-    public Object datePosted;
+    public String datePosted;
 }
