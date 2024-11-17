@@ -2,7 +2,6 @@ package com.cmpt.memogram.classes;
 
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -15,7 +14,7 @@ import java.util.Map;
 public class UserManager {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    Map<String, String> userDoc = new HashMap<>();
+    Map<String, Object> userDoc = new HashMap<>();
     {this.getUserDoc();}
 
     //Returns a bool dependent on if a user is logged in
@@ -33,18 +32,16 @@ public class UserManager {
 
     //Get name of User
     public String getName(){
-        if (loginStatus()) {
-            getUserDoc();
-            return userDoc.get("name");
+        if (userDoc.get("name") != null) {
+            return userDoc.get("name").toString();
         }
         return null;
     }
 
     //Get groupID of User
     public String getGroupID() {
-        if (loginStatus()) {
-            getUserDoc();
-            return userDoc.get("groupID");
+        if (userDoc.get("groupID") != null) {
+            return userDoc.get("groupID").toString();
         }
         return null;
     }
@@ -92,9 +89,8 @@ public class UserManager {
             if (getUser.isSuccessful()) {
                 DocumentSnapshot document = getUser.getResult();
                 if (document.exists()) {
-                    Log.d("getUser", "Data:" + document.getData());
-                    userDoc.put("name", document.getData().get("name").toString());
-                    userDoc.put("groupID", document.getData().get("name").toString());
+                    userDoc.put("name", document.getData().get("name"));
+                    userDoc.put("groupID", document.getData().get("groupID"));
                 } else {
                     Log.d("getUser", "No such document");
                 }
@@ -122,8 +118,6 @@ public class UserManager {
     //Leaves group user is currently in
     public void leaveGroup() {
         //update group
-        Map<String, Object> groupUpdate = new HashMap<>();
-        groupUpdate.put("name", getName());
         db.collection("FamilyGroups")
                 .document(getGroupID()).collection("Members").document(getID())
                 .delete();
@@ -136,21 +130,16 @@ public class UserManager {
     }
 
     //Creates a group
-    //two collections and a name.
     public void createGroup(String name) {
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("Create Group", "DocumentSnapshot written with ID: " + documentReference.getId());
-                        String createdGroupID = documentReference.getId();
-                        joinGroup(createdGroupID);
-                    }
+                .addOnSuccessListener(documentReference -> {
+                    String createdGroupID = documentReference.getId();
+                    joinGroup(createdGroupID);
                 })
-                .addOnFailureListener(fail -> {
-                        Log.w("Create Group", "Error adding document");
-                });
+                .addOnFailureListener(fail -> Log
+                        .w("Create Group", "Error adding document"));
     }
+
 }
