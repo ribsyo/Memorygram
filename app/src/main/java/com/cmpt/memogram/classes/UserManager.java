@@ -82,7 +82,6 @@ public class UserManager {
                 if (document.exists()) {
                     userDoc.put("name", document.getString("name"));
                     userDoc.put("groupID", document.getString("groupID"));
-                    return;
                 } else {
                     Log.d("getUser", "No such document");
                 }
@@ -123,5 +122,21 @@ public class UserManager {
         db.collection("FamilyGroups")
                 .document(groupJoinID).collection("Members").document(getID())
                 .set(groupUpdate, SetOptions.merge());
+    }
+
+    //Leaves group user is currently in
+    public void leaveGroup() {
+        //update group
+        Map<String, Object> groupUpdate = new HashMap<>();
+        groupUpdate.put("name", getName());
+        db.collection("FamilyGroups")
+                .document(getGroupID()).collection("Members").document(getID())
+                .delete();
+
+        //update user
+        Map<String, Object> userUpdate = new HashMap<>();
+        userUpdate.put("groupID", "");
+        db.collection("Users").document(getID())
+                .set(userUpdate, SetOptions.merge());
     }
 }
