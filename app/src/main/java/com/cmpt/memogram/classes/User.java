@@ -19,8 +19,13 @@ public class User {
     String name = null;
     String groupID = null;
 
-    //logs in with provided credentials
-    public void login (String username, String password) {
+    //Returns a bool dependent on if a user is logged in
+    public boolean authStatus() {
+        return  mAuth.getCurrentUser() == null;
+    }
+
+    //Logs in with provided credentials returns true on success
+    public boolean login (String username, String password) {
         mAuth.signInWithEmailAndPassword(username, password)
                 .addOnCompleteListener(login -> {
                     if (login.isSuccessful()) {
@@ -52,7 +57,11 @@ public class User {
                         Log.w("login", "loginUserWithEmail:failure", login.getException());
                     }
                 });
+        return mAuth.getCurrentUser() != null;
     }
+
+
+
     //Joins a group by groupID
     public void joinGroup (String groupJoinID) {
         Map<String, Object> data = new HashMap<>();
