@@ -1,16 +1,9 @@
 package com.cmpt.memogram.classes;
 
-import static android.content.ContentValues.TAG;
-
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,6 +16,7 @@ public class UserManager {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     Map<String, String> userDoc = new HashMap<>();
+    {this.getUserDoc();}
 
     //Returns a bool dependent on if a user is logged in
     public boolean loginStatus() {
@@ -34,7 +28,25 @@ public class UserManager {
         if (mAuth.getCurrentUser() != null) {
             return mAuth.getCurrentUser().getUid();
         }
-        return "";
+        return null;
+    }
+
+    //Get name of User
+    public String getName(){
+        if (loginStatus()) {
+            getUserDoc();
+            return userDoc.get("name");
+        }
+        return null;
+    }
+
+    //Get groupID of User
+    public String getGroupID() {
+        if (loginStatus()) {
+            getUserDoc();
+            return userDoc.get("groupID");
+        }
+        return null;
     }
 
     //Logs in with provided credentials returns true on success
@@ -50,7 +62,7 @@ public class UserManager {
                         Log.w("login", "loginUserWithEmail:failure", login.getException());
                     }
                 });
-        return mAuth.getCurrentUser() != null;
+        return loginStatus();
     }
     public boolean register (String username, String password, String name) {
         mAuth.createUserWithEmailAndPassword(username, password)
@@ -69,7 +81,7 @@ public class UserManager {
                             Log.w("register", "createUserWithEmail:failure", register.getException());
                         }
                 });
-        return mAuth.getCurrentUser() != null;
+        return loginStatus();
     }
 
     //populate userMap
@@ -80,8 +92,9 @@ public class UserManager {
             if (getUser.isSuccessful()) {
                 DocumentSnapshot document = getUser.getResult();
                 if (document.exists()) {
-                    userDoc.put("name", document.getString("name"));
-                    userDoc.put("groupID", document.getString("groupID"));
+                    Log.d("getUser", "Data:" + document.getData());
+                    userDoc.put("name", document.getData().get("name").toString());
+                    userDoc.put("groupID", document.getData().get("name").toString());
                 } else {
                     Log.d("getUser", "No such document");
                 }
@@ -89,24 +102,6 @@ public class UserManager {
                 Log.d("getUser", "get failed with ", getUser.getException());
             }
         });
-    }
-
-    //Get name of User
-    public String getName() {
-        if (mAuth.getCurrentUser() != null) {
-            getUserDoc();
-            return userDoc.get("name");
-        }
-        return null;
-    }
-
-    //Get groupID of User
-    public String getGroupID() {
-        if (mAuth.getCurrentUser() != null) {
-            getUserDoc();
-            return userDoc.get("groupID");
-        }
-        return null;
     }
 
     //Joins a group by groupID
@@ -138,5 +133,24 @@ public class UserManager {
         userUpdate.put("groupID", "");
         db.collection("Users").document(getID())
                 .set(userUpdate, SetOptions.merge());
+    }
+
+    //Creates a group
+    //two collections and a name.
+    public void createGroup(String name) {
+        Map<String, String> data = new HashMap<>();
+        data.put("name", name);
+        db.collection("FamilyGroups").add(data)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("Create Group", "DocumentSnapshot written with ID: " + documentReference.getId());
+                        String createdGroupID = documentReference.getId();
+                        joinGroup(createdGroupID);
+                    }
+                })
+                .addOnFailureListener(fail -> {
+                        Log.w("Create Group", "Error adding document");
+                });
     }
 }
