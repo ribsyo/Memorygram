@@ -1,4 +1,6 @@
-package com.cmpt.memogram.classes;
+package com.cmpt.memogram;
+
+import com.cmpt.memogram.Post;
 
 public interface OnGetPostListener {
     //this is for callbacks
