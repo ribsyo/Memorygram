@@ -8,14 +8,19 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -51,13 +56,15 @@ public class PostManager {
                         getMedia(finalPost.imagePath, new OnGetFileListener() {
                             @Override
                             public void onSuccess(File imageFile) {
+                                System.out.println("got image file");
                                 finalPost.localImagePath = imageFile.getAbsolutePath();
 
                                 //get audio
                                 getMedia(finalPost.audioPath, new OnGetFileListener() {
                                     @Override
-                                    public void onSuccess(File audiuoFile) {
-                                        finalPost.localAudioPath = imageFile.getAbsolutePath();
+                                    public void onSuccess(File audioFile) {
+                                        finalPost.localAudioPath = audioFile.getAbsolutePath();
+                                        listener.onSuccess(finalPost);
                                     }
 
                                     @Override
@@ -74,7 +81,6 @@ public class PostManager {
                                 listener.onFailure();
                             }
                         });
-                        listener.onSuccess(post);
                     } else {
                         Log.d(TAG, "No such document");
                         listener.onFailure();
@@ -99,7 +105,7 @@ public class PostManager {
         post.text = (String)dr.get("text");
         post.audioPath = (String)dr.get("audioPath");
         post.imagePath = (String)dr.get("imagePath");
-        post.datePosted = dr.get("datePosted");
+        post.datePosted = dr.get("datePosted").toString();
         return post;
     }
 
@@ -108,11 +114,17 @@ public class PostManager {
     public void getMedia(String path, final OnGetFileListener listener) {
         try {
             // Create a temporary file
-            File localFile = File.createTempFile("media", null);
+            String ext = path.substring(path.lastIndexOf("."));
+            File localFile = File.createTempFile("media", ext);
+            // Change this to the actual extension
+
+            // New file name with the original extension
+
 
             sr.child(path).getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
                     // File downloaded successfully
                     listener.onSuccess(localFile);
                 }
@@ -128,5 +140,26 @@ public class PostManager {
             listener.onFailure();
         }
     }
+
+    public void getAllPostNames(final OnGetPostNamesListener listener) {
+        CollectionReference postsCollection = this.db.collection("FamilyGroups").document(this.fg).collection("Posts");
+
+        postsCollection.orderBy("datePosted").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<String> postNames = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        postNames.add(document.getId());
+                    }
+                    listener.onSuccess(postNames);
+                } else {
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                    listener.onFailure();
+                }
+            }
+        });
+    }
+
 }
 

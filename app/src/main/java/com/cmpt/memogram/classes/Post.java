@@ -7,5 +7,5 @@ public class Post {
     public String localAudioPath;
     public String imagePath;
     public String localImagePath;
-    public Object datePosted;
+    public String datePosted;
 }
