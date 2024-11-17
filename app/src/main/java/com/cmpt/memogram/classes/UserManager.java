@@ -1,7 +1,14 @@
 package com.cmpt.memogram.classes;
 
+import static android.content.ContentValues.TAG;
+
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -45,9 +52,28 @@ public class UserManager {
                 });
         return mAuth.getCurrentUser() != null;
     }
+    public boolean register (String username, String password, String name) {
+        mAuth.createUserWithEmailAndPassword(username, password)
+                .addOnCompleteListener(register -> {
+                        if (register.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("register", "createUserWithEmail:success");
+                            Map<String, String> newUser = new HashMap<>();
+                            newUser.put("groupID", "");
+                            newUser.put("name", name);
+
+                            db.collection("Users").document(getID())
+                                    .set(newUser, SetOptions.merge());
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("register", "createUserWithEmail:failure", register.getException());
+                        }
+                });
+        return mAuth.getCurrentUser() != null;
+    }
 
     //populate userMap
-    public void getUserDoc() {
+    private void getUserDoc() {
         DocumentReference docRef = db.collection("Users")
                 .document(getID());
         docRef.get().addOnCompleteListener(getUser -> {
@@ -83,7 +109,6 @@ public class UserManager {
         }
         return null;
     }
-
 
     //Joins a group by groupID
     public void joinGroup (String groupJoinID) {
