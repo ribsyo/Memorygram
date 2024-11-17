@@ -112,9 +112,16 @@ public class UserManager {
 
     //Joins a group by groupID
     public void joinGroup (String groupJoinID) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("groupID", groupJoinID);
+        //update user
+        Map<String, Object> userUpdate = new HashMap<>();
+        userUpdate.put("groupID", groupJoinID);
         db.collection("Users").document(getID())
-                .set(data, SetOptions.merge());
+                .set(userUpdate, SetOptions.merge());
+        //update group
+        Map<String, Object> groupUpdate = new HashMap<>();
+        groupUpdate.put("name", getName());
+        db.collection("FamilyGroups")
+                .document(groupJoinID).collection("Members").document(getID())
+                .set(groupUpdate, SetOptions.merge());
     }
 }
