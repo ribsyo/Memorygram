@@ -3,7 +3,7 @@ package com.cmpt.memogram.ui.login;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.cmpt.memogram.classes.User;
+import com.cmpt.memogram.classes.UserManager;
 import android.util.Pair;
 
 public class LoginViewModel extends ViewModel {
@@ -11,7 +11,7 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<String> password = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loginSuccess = new MutableLiveData<>();
     private final MutableLiveData<Pair<Boolean, String>> signUpSuccess = new MutableLiveData<>();
-    private final User user = new User();
+    private final UserManager userManager = new UserManager();
 
     public LiveData<String> getUsername() {
         return username;
@@ -38,11 +38,12 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login() {
-        user.login(username.getValue(), password.getValue());
-        user.getLoginResult().observeForever(success -> loginSuccess.setValue(success));
+        boolean success = userManager.login(username.getValue(), password.getValue());
+        loginSuccess.setValue(success);
     }
 
     public void signUp(String username, String password) {
-        user.signUp(username, password, (success, errorMessage) -> signUpSuccess.setValue(new Pair<>(success, errorMessage)));
+        boolean success = userManager.register(username, password, username);
+        signUpSuccess.setValue(new Pair<>(success, success ? null : "Sign-up failed"));
     }
 }

@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.cmpt.memogram.R;
-import com.cmpt.memogram.classes.User;
 
 public class LoginFragment extends Fragment {
 
@@ -38,9 +37,16 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(getContext(), "Email and password cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
             loginViewModel.setUsername(email);
             loginViewModel.setPassword(password);
             loginViewModel.login();
+
+
 
             loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
                 if (success) {

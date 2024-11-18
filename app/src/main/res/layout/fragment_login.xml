@@ -76,6 +76,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:text="Login"
+        android:backgroundTint="@color/blue"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/password" />
@@ -89,6 +91,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:text="Sign Up"
+        android:backgroundTint="@color/blue"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/login_button" />
