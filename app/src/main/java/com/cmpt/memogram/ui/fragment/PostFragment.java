@@ -21,7 +21,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.PostManager;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import java.io.ByteArrayOutputStream;
@@ -38,6 +37,7 @@ public class PostFragment extends Fragment {
     private ImageButton imageButton;
     private EditText captionEditText;
     private EditText tagsEditText;
+    private EditText titleEditText;
     private Button postButton;
     private Button audioButton;
     private Button playbackButton;
@@ -52,8 +52,6 @@ public class PostFragment extends Fragment {
     private boolean isRecording = false;
 
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,6 +60,7 @@ public class PostFragment extends Fragment {
         imageButton = view.findViewById(R.id.imageButton);
         captionEditText = view.findViewById(R.id.AddCaption);
         tagsEditText = view.findViewById(R.id.AddTags);
+        titleEditText = view.findViewById(R.id.AddTitle);
         postButton = view.findViewById(R.id.Post);
         audioButton = view.findViewById(R.id.Audio);
         playbackButton = view.findViewById(R.id.PlayBack);
@@ -111,7 +110,7 @@ public class PostFragment extends Fragment {
                 if (selectedImageUri != null) {
                     String caption = captionEditText.getText().toString();
                     String tags = tagsEditText.getText().toString();
-                    //String title =
+                    String title = titleEditText.getText().toString();
 
                     prepareImageBytes();
                     prepareAudioBytes();
@@ -123,7 +122,7 @@ public class PostFragment extends Fragment {
                             audioBytes
                     );
 
-                    String title = getFileName(selectedImageUri);
+                    //String title = getFileName(selectedImageUri);
                     //byte[] audioData = new byte[1];
 
                     Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
@@ -136,14 +135,14 @@ public class PostFragment extends Fragment {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
-                            cleanupMediaResources();
-                            resetForm();
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, new HomeFragment())
+                                    .commit();
                         }
 
                         @Override
                         public void onFailure() {
                             System.out.println("Failed to upload post.");
-                            cleanupMediaResources();
                         }
                     });
 
