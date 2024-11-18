@@ -1,4 +1,4 @@
-package com.cmpt.memogram;
+package com.cmpt.memogram.classes;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
@@ -15,9 +15,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.sql.Timestamp;
-import java.util.concurrent.CountDownLatch;
 
 public class PostManager {
     private String fg = "testGroup";
