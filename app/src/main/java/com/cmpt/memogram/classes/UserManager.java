@@ -48,6 +48,9 @@ public class UserManager {
 
     //Logs in with provided credentials returns true on success
     public boolean login (String username, String password) {
+        if (username == null || password == null) {
+            return false;
+        }
         mAuth.signInWithEmailAndPassword(username, password)
                 .addOnCompleteListener(login -> {
                     if (login.isSuccessful()) {
@@ -62,6 +65,9 @@ public class UserManager {
         return loginStatus();
     }
     public boolean register (String username, String password, String name) {
+        if (username == null || password == null) {
+            return false;
+        }
         mAuth.createUserWithEmailAndPassword(username, password)
                 .addOnCompleteListener(register -> {
                         if (register.isSuccessful()) {
@@ -102,6 +108,9 @@ public class UserManager {
 
     //Joins a group by groupID
     public void joinGroup (String groupJoinID) {
+        if (groupJoinID == null) {
+            return;
+        }
         //update user
         Map<String, Object> userUpdate = new HashMap<>();
         userUpdate.put("groupID", groupJoinID);
@@ -131,6 +140,9 @@ public class UserManager {
 
     //Creates a group
     public void createGroup(String name) {
+        if (name == null) {
+            name = "";
+        }
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
