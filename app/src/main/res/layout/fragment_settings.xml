@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity"
-    android:background="@color/grey">
+    android:background="@color/dark_green"
+    android:layout_marginTop="65dp">
 
     <!-- Top Block Layout -->
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:backgroundTint="@color/red"
+        android:backgroundTint="@color/dark_green"
         android:id="@+id/toolbar"
         android:background="?android:attr/windowBackground"
         app:layout_constraintTop_toTopOf="parent">
@@ -31,7 +32,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -52,9 +52,9 @@
             android:id="@+id/generate_one_time_code_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/light_green"
             android:text="generate one time code"
-            android:textColor="@color/blue" />
+            android:textColor="@color/white" />
 
         <!-- Edit Profile Button  -->
         <Button
@@ -62,9 +62,9 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/light_green"
             android:text="edit profile"
-            android:textColor="@color/blue" />
+            android:textColor="@color/white" />
 
         <!-- Manage Family Button  -->
         <Button
@@ -72,9 +72,9 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/light_green"
             android:text="manage family"
-            android:textColor="@color/blue" />
+            android:textColor="@color/white" />
 
         <!-- Leave Family Button  -->
         <Button
@@ -82,9 +82,9 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/light_green"
             android:text="leave family"
-            android:textColor="@color/blue" />
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
