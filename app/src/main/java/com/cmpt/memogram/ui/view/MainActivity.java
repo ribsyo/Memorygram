@@ -1,5 +1,6 @@
 package com.cmpt.memogram.ui.view;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -9,10 +10,24 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.cmpt.memogram.R;
-import com.cmpt.memogram.classes.UserManager;
+import com.cmpt.memogram.classes.OnGetPostListener;
+import com.cmpt.memogram.classes.OnGetPostNamesListener;
+import com.cmpt.memogram.classes.OnUploadPostListener;
+import com.cmpt.memogram.classes.Post;
+import com.cmpt.memogram.classes.PostManager;
 import com.cmpt.memogram.ui.login.LoginFragment;
 import com.cmpt.memogram.ui.settings.SettingsFragment;
 import com.cmpt.memogram.ui.post.CreatePostFragment;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import android.content.Context;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        
     }
 
     @Override
