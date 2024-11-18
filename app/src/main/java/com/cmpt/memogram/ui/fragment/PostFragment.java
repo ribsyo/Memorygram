@@ -37,6 +37,7 @@ public class PostFragment extends Fragment {
     private ImageButton imageButton;
     private EditText captionEditText;
     private EditText tagsEditText;
+    private EditText titleEditText;
     private Button postButton;
     private Button audioButton;
     private Button playbackButton;
@@ -59,6 +60,7 @@ public class PostFragment extends Fragment {
         imageButton = view.findViewById(R.id.imageButton);
         captionEditText = view.findViewById(R.id.AddCaption);
         tagsEditText = view.findViewById(R.id.AddTags);
+        titleEditText = view.findViewById(R.id.AddTitle);
         postButton = view.findViewById(R.id.Post);
         audioButton = view.findViewById(R.id.Audio);
         playbackButton = view.findViewById(R.id.PlayBack);
@@ -108,7 +110,7 @@ public class PostFragment extends Fragment {
                 if (selectedImageUri != null) {
                     String caption = captionEditText.getText().toString();
                     String tags = tagsEditText.getText().toString();
-                    //String title =
+                    String title = titleEditText.getText().toString();
 
                     prepareImageBytes();
                     prepareAudioBytes();
@@ -120,7 +122,7 @@ public class PostFragment extends Fragment {
                             audioBytes
                     );
 
-                    String title = getFileName(selectedImageUri);
+                    //String title = getFileName(selectedImageUri);
                     //byte[] audioData = new byte[1];
 
                     Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
