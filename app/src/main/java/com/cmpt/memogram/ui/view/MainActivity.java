@@ -1,5 +1,6 @@
 package com.cmpt.memogram.ui.view;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -12,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.OnGetPostListener;
 import com.cmpt.memogram.classes.OnGetPostNamesListener;
+import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.Post;
 import com.cmpt.memogram.classes.PostManager;
 import com.cmpt.memogram.ui.login.LoginFragment;
@@ -21,7 +23,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+
+import android.content.Context;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,15 +87,13 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage fs = FirebaseStorage.getInstance();
-        PostManager postManager = new PostManager(db, fs, "testGroup");
+        PostManager postManager = new PostManager(db, fs, "testGroup", "testUser");
 
-        postManager.getPost("testPost", new OnGetPostListener() {
+        postManager.getPost("0oAUN9YV8SZPM1FpeVdb", new OnGetPostListener() {
             @Override
             public void onSuccess(Post post) {
                 // Print out the text result
-                System.out.println("Post text: " + post.localImagePath);
-                File file = new File(post.localImagePath);
-                System.out.println("File exists: " + file.exists());
+                System.out.println("downloadLink " + post.imageDownloadLink);
 
             }
 
@@ -113,6 +118,44 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Failed to get post names.");
             }
         });
+
+        String title = "test upload";
+        String text = "upload?";
+        byte[] audioData;
+        byte[] imageData;
+        try {
+            audioData = loadFileAsBytes("testAudio.mp3");
+            imageData = loadFileAsBytes("testImage.png");
+            System.out.println("Loaded File Correctly.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            audioData = new byte[0];
+            imageData = new byte[0];
+            System.out.println("Failed to load file.");
+        }
+            String userID = "testUser";
+
+        /*
+        postManager.uploadPost(title, text, audioData, imageData, userID, new OnUploadPostListener() {
+            @Override
+            public void onSuccess() {
+                System.out.println("Post uploaded successfully.");
+            }
+
+            @Override
+            public void onFailure() {
+                System.out.println("Failed to upload post.");
+            }
+        });*/
+    }
+
+    public byte[] loadFileAsBytes(String filePath) throws IOException {
+        AssetManager assetManager = getAssets();
+        InputStream is = assetManager.open(filePath);
+        byte[] fileBytes = new byte[is.available()];
+        is.read(fileBytes);
+        is.close();
+        return fileBytes;
     }
 
     @Override

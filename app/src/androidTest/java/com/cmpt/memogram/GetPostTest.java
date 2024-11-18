@@ -13,7 +13,7 @@ public class GetPostTest {
     public void testGetPost() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage fs = FirebaseStorage.getInstance();
-        PostManager postManager = new PostManager(db, fs, "testGroup");
+        PostManager postManager = new PostManager(db, fs, "testGroup", "testUser");
 
         postManager.getPost("testPost", new OnGetPostListener() {
             @Override
