@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Memogram</string>
+    <string name="logo">Logo</string>
     <string name="view_collection">View Collection</string>
     <string name="post">Post</string>
 

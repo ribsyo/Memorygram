@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.OnGetPostListener;
 import com.cmpt.memogram.classes.OnGetPostNamesListener;
@@ -32,6 +31,8 @@ import android.content.Context;
 
 public class MainActivity extends AppCompatActivity {
 
+    private UserManager userManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,9 +42,16 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
 
-        // Load LoginFragment initially
-        if (savedInstanceState == null) {
-            replaceFragment(new LoginFragment(), false);
+        userManager = new UserManager();
+
+        if (userManager.loginStatus()) {
+            // User is logged in, proceed to the main content
+            findViewById(R.id.top_block).setVisibility(View.VISIBLE);
+        } else {
+            // User is not logged in, show the login fragment
+            if (savedInstanceState == null) {
+                replaceFragment(new LoginFragment(), false);
+            }
         }
 
         // Check for button clicks
