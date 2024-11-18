@@ -15,6 +15,9 @@ import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.Post;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
@@ -41,7 +44,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             Post post = mPosts.get(position);
             holder.description.setText(post.text);
             holder.title.setText(post.title);
-            holder.postDate.setText(post.getRelativeTime());
+            holder.postDate.setText(getRelativeTime(post.datePosted));
 
             String imageUrl = post.imageDownloadLink;
             System.out.println("Loading image URL: " + imageUrl);
@@ -63,6 +66,45 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public int getItemCount() {
         // Return the total number of items in the list
         return mPosts.size();
+    }
+
+    public String getRelativeTime(String datePosted) {
+        try {
+            long postTime;
+            if (datePosted.contains("Timestamp")) {
+                // Assuming datePosted is in the format "Timestamp(seconds=..., nanoseconds=...)"
+                String[] parts = datePosted.split("[=,)]");
+                long seconds = Long.parseLong(parts[1].trim());
+                postTime = seconds * 1000;
+            } else {
+                postTime = Long.parseLong(datePosted);
+            }
+
+            long currentTime = System.currentTimeMillis();
+            long diff = currentTime - postTime;
+
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+            long hours = TimeUnit.MILLISECONDS.toHours(diff);
+            long days = TimeUnit.MILLISECONDS.toDays(diff);
+
+            if (seconds < 60) {
+                return "just now";
+            } else if (minutes == 1) {
+                return "a minute ago";
+            } else if (minutes > 1 && minutes < 60) {
+                return minutes + " minutes ago";
+            } else if (hours < 24) {
+                return hours + " hours ago";
+            } else {
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                Date date = new Date(postTime);
+                return sdf.format(date);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "unknown time";
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

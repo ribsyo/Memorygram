@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.ui.LoginViewModel;
+import com.cmpt.memogram.ui.MainActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class LoginFragment extends Fragment {
 
@@ -49,11 +52,9 @@ public class LoginFragment extends Fragment {
 
 
             loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
+
                 if (success) {
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .remove(LoginFragment.this)
-                            .commit();
-                    getActivity().findViewById(R.id.top_block).setVisibility(View.VISIBLE);
+                    ((MainActivity) getActivity()).createMainContent();
                 } else {
                     Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
                 }
@@ -80,4 +81,6 @@ public class LoginFragment extends Fragment {
             });
         });
     }
+
+
 }

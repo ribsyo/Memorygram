@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.PostManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import java.io.ByteArrayOutputStream;
@@ -49,6 +50,8 @@ public class PostFragment extends Fragment {
     private MediaPlayer mediaPlayer;
     private String audioFilePath;
     private boolean isRecording = false;
+
+
 
 
     @Override
