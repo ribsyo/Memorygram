@@ -44,15 +44,25 @@
         tools:srcCompat="@android:drawable/stat_sys_upload_done" />
 
     <EditText
-        android:id="@+id/AddCaption"
+        android:id="@+id/AddTitle"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_marginTop="20dp"
-        android:hint="WRITE CAPTION"
+        android:hint="WRITE TITLE"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButton" />
+
+    <EditText
+        android:id="@+id/AddCaption"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="WRITE CAPTION"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AddTitle" />
 
     <EditText
         android:id="@+id/AddTags"
