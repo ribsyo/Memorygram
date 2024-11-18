@@ -9,7 +9,9 @@ import androidx.annotation.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,17 +25,20 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 public class PostManager {
     private String fg = "testGroup";
+    private String userID = "testUser";
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private StorageReference sr;
-    public PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg){
+    public PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg, String userID){
         this.db = db;
         this.fg = fg;
         this.fs = fs;
+        this.userID = userID;
         this.sr = this.fs.getReference();
     }
 
@@ -143,4 +148,79 @@ public class PostManager {
         });
     }
 
+    // OnUploadFileListener.java
+    public void uploadFile(String filePath, byte[] fileData, final OnUploadFileListener listener) {
+        StorageReference fileRef = this.sr.child(filePath);
+
+        fileRef.putBytes(fileData)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // File uploaded successfully
+                    fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        // File download URL retrieved successfully
+                        listener.onSuccess(uri.toString());
+                    }).addOnFailureListener(exception -> {
+                        // Handle any errors
+                        listener.onFailure();
+                    });
+                })
+                .addOnFailureListener(exception -> {
+                    // Handle any errors
+                    listener.onFailure();
+                });
+    }
+
+    public void uploadPost(String title, String text, byte[] audioData, byte[] imageData, final OnUploadPostListener listener) {
+        // Upload audio file
+        String audioFilePath = fg + "/" + UUID.randomUUID().toString()+ "." + "mp3";
+        String imageFilePath = fg + "/" + UUID.randomUUID().toString()+ "." + "jpeg";
+
+        StorageMetadata audioMetadata = new StorageMetadata.Builder()
+                .setContentType("audio/mpeg")
+                .build();
+
+        StorageMetadata imageMetadata = new StorageMetadata.Builder()
+                .setContentType("image/jpeg")
+                .build();
+
+        StorageReference audioRef = this.sr.child(audioFilePath);
+        audioRef.putBytes(audioData, audioMetadata)
+                .addOnSuccessListener(audioTaskSnapshot -> {
+                    audioRef.getDownloadUrl().addOnSuccessListener(audioUri -> {
+                        // Upload image file
+                        StorageReference imageRef = this.sr.child(imageFilePath);
+                        imageRef.putBytes(imageData, imageMetadata)
+                                .addOnSuccessListener(imageTaskSnapshot -> {
+                                    imageRef.getDownloadUrl().addOnSuccessListener(imageUri -> {
+                                        // Create post object
+                                        PostUpload newPost = new PostUpload();
+                                        newPost.audioPath = audioFilePath;
+                                        newPost.imagePath = imageFilePath;
+                                        newPost.text = text;
+                                        newPost.title = title;
+                                        newPost.posterID = this.userID;
+                                        newPost.datePosted = new Date();
+                                        // Save post to Firestore
+                                        this.db.collection("FamilyGroups").document(this.fg).collection("Posts")
+                                                .add(newPost)
+                                                .addOnSuccessListener(documentReference -> {
+                                                    listener.onSuccess();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    listener.onFailure();
+                                                });
+                                    }).addOnFailureListener(e -> {
+                                        listener.onFailure();
+                                    });
+                                }).addOnFailureListener(e -> {
+                                    listener.onFailure();
+                                });
+                    }).addOnFailureListener(e -> {
+                        listener.onFailure();
+                    });
+                }).addOnFailureListener(e -> {
+                    listener.onFailure();
+                });
+    }
+
 }
+
