@@ -46,8 +46,6 @@ public class LoginFragment extends Fragment {
             loginViewModel.setPassword(password);
             loginViewModel.login();
 
-
-
             loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
                 if (success) {
                     getActivity().getSupportFragmentManager().beginTransaction()

@@ -38,8 +38,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login() {
-        boolean success = userManager.login(username.getValue(), password.getValue());
-        loginSuccess.setValue(success);
+        userManager.login(username.getValue(), password.getValue(), success -> loginSuccess.setValue(success));
     }
 
     public void signUp(String username, String password) {
