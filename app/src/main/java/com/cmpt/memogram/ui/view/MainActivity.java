@@ -8,13 +8,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.classes.User;
 import com.cmpt.memogram.ui.login.LoginFragment;
 import com.cmpt.memogram.ui.settings.SettingsFragment;
 import com.cmpt.memogram.ui.post.CreatePostFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +27,16 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
 
-        // Load LoginFragment initially
-        if (savedInstanceState == null) {
-            replaceFragment(new LoginFragment(), false);
+        user = new User();
+
+        if (user.isLoggedIn()) {
+            // User is logged in, proceed to the main content
+            findViewById(R.id.top_block).setVisibility(View.VISIBLE);
+        } else {
+            // User is not logged in, show the login fragment
+            if (savedInstanceState == null) {
+                replaceFragment(new LoginFragment(), false);
+            }
         }
 
         // Check for button clicks
