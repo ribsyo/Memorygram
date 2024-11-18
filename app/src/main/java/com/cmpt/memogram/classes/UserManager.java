@@ -136,10 +136,29 @@ public class UserManager {
         db.collection("FamilyGroups").add(data)
                 .addOnSuccessListener(documentReference -> {
                     String createdGroupID = documentReference.getId();
+
+                    //sets creator as admin and joins
+                    Map<String, String> admin = new HashMap<>();
+                    admin.put("admin", getID());
+                    db.collection("FamilyGroups")
+                            .document(createdGroupID)
+                            .set(admin, SetOptions.merge());
                     joinGroup(createdGroupID);
                 })
                 .addOnFailureListener(fail -> Log
                         .w("Create Group", "Error adding document"));
     }
 
+    //TODO: Output members of group
+    //public String[] getGroupMembers() {
+    //   return null;
+    //}
+    //Outputs group id for invite function,
+    //TODO: add functionality for one time join code?
+    public String getGroupCode() {
+        return getGroupID();
+    }
+
+    //TODO: Add invite functionality.
+    //
 }
