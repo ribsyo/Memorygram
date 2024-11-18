@@ -3,11 +3,15 @@ package com.cmpt.memogram.ui.login;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import com.cmpt.memogram.classes.UserManager;
+import android.util.Pair;
 
 public class LoginViewModel extends ViewModel {
     private final MutableLiveData<String> username = new MutableLiveData<>();
     private final MutableLiveData<String> password = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loginSuccess = new MutableLiveData<>();
+    private final MutableLiveData<Pair<Boolean, String>> signUpSuccess = new MutableLiveData<>();
+    private final UserManager userManager = new UserManager();
 
     public LiveData<String> getUsername() {
         return username;
@@ -29,13 +33,17 @@ public class LoginViewModel extends ViewModel {
         return loginSuccess;
     }
 
+    public LiveData<Pair<Boolean, String>> getSignUpSuccess() {
+        return signUpSuccess;
+    }
+
     public void login() {
-        // Add your login logic here
-        // For example, check if username and password are correct
-        if ("user".equals(username.getValue()) && "pass".equals(password.getValue())) {
-            loginSuccess.setValue(true);
-        } else {
-            loginSuccess.setValue(false);
-        }
+        boolean success = userManager.login(username.getValue(), password.getValue());
+        loginSuccess.setValue(success);
+    }
+
+    public void signUp(String username, String password) {
+        boolean success = userManager.register(username, password, username);
+        signUpSuccess.setValue(new Pair<>(success, success ? null : "Sign-up failed"));
     }
 }
