@@ -15,6 +15,7 @@ import com.cmpt.memogram.classes.OnGetPostNamesListener;
 import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.Post;
 import com.cmpt.memogram.classes.PostManager;
+import com.cmpt.memogram.classes.UserManager;
 import com.cmpt.memogram.ui.login.LoginFragment;
 import com.cmpt.memogram.ui.settings.SettingsFragment;
 import com.cmpt.memogram.ui.post.CreatePostFragment;
