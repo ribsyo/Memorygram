@@ -1,11 +1,12 @@
 package com.cmpt.memogram.classes;
 
-public class Post {
+import java.util.Date;
+public class PostUpload {
     public String title;
     public String text;
+    public Date datePosted;
     public String audioPath;
-    public String audioDownloadLink;
     public String imagePath;
-    public String imageDownloadLink;
-    public String datePosted;
+    public String posterID;
+
 }
