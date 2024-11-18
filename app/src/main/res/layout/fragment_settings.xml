@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity"
-    android:background="@color/grey">
+    android:background="@color/dark_green"
+    android:layout_marginTop="65dp">
 
     <!-- Top Block Layout -->
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:backgroundTint="@color/red"
+        android:backgroundTint="@color/dark_green"
         android:id="@+id/toolbar"
         android:background="?android:attr/windowBackground"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,13 +26,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SETTINGS"
+                android:fontFamily="@font/nunito"
+                android:paddingTop="16dp"
+                android:textStyle="bold"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -50,41 +53,53 @@
         <!-- Generate One-Time Code Button  -->
         <Button
             android:id="@+id/generate_one_time_code_btn"
-            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_width="350dp"
             android:layout_height="50dp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/light_green"
             android:text="generate one time code"
-            android:textColor="@color/blue" />
+            android:fontFamily="@font/ptsans"
+            android:textSize="14sp"
+            android:textColor="@color/white" />
 
         <!-- Edit Profile Button  -->
         <Button
             android:id="@+id/edit_profile_btn"
-            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/light_green"
             android:text="edit profile"
-            android:textColor="@color/blue" />
+            android:fontFamily="@font/ptsans"
+            android:textSize="14sp"
+            android:textColor="@color/white" />
 
         <!-- Manage Family Button  -->
         <Button
             android:id="@+id/manage_family_btn"
-            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
+            android:textSize="14sp"
+            android:backgroundTint="@color/light_green"
             android:text="manage family"
-            android:textColor="@color/blue" />
+            android:fontFamily="@font/ptsans"
+            android:textColor="@color/white" />
 
         <!-- Leave Family Button  -->
         <Button
             android:id="@+id/leave_family_btn"
-            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
+            android:textSize="14sp"
+            android:backgroundTint="@color/light_green"
             android:text="leave family"
-            android:textColor="@color/blue" />
+            android:fontFamily="@font/ptsans"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
