@@ -9,3 +9,4 @@ public class Post {
     public String imageDownloadLink;
     public String datePosted;
 }
+

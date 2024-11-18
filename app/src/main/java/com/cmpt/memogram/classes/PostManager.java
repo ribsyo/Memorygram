@@ -197,7 +197,7 @@ public class PostManager {
                                         newPost.imagePath = imageFilePath;
                                         newPost.text = text;
                                         newPost.title = title;
-                                        newPost.posterID = this.userID;
+                                        newPost.posterID = userID;
                                         newPost.datePosted = new Date();
                                         // Save post to Firestore
                                         this.db.collection("FamilyGroups").document(this.fg).collection("Posts")

@@ -135,14 +135,11 @@ public class PostFragment extends Fragment {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
-                            cleanupMediaResources();
-                            resetForm();
                         }
 
                         @Override
                         public void onFailure() {
                             System.out.println("Failed to upload post.");
-                            cleanupMediaResources();
                         }
                     });
 
