@@ -1,74 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey"
-    tools:context=".ui.view.MainActivity">
+    tools:context=".ui.MainActivity">
 
-    <!-- Top Block Layout -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/top_block"
+    <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="@color/red"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="65dp"
+        android:id="@+id/toolbar"
+        android:background="@color/dark_green">
 
-        <!-- Settings Button  -->
-        <ImageButton
-            android:id="@+id/settings_btn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="25dp"
-            android:backgroundTint="@color/white"
-            android:contentDescription="@string/settings"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:srcCompat="@drawable/ic_settings" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- View Collection Button  -->
-        <Button
-            android:id="@+id/collection_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:backgroundTint="@color/white"
-            android:drawableLeft="@drawable/ic_view_collection"
-            android:text="@string/view_collection"
-            android:textColor="@color/blue"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/post_btn"
-            app:layout_constraintStart_toEndOf="@+id/settings_btn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            <Button
+                android:id="@+id/view_collection_btn"
+                android:layout_marginTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="22dp"
+                android:backgroundTint="@color/light_green"
+                android:fontFamily="@font/ptsans"
+                android:text="view collection"
+                android:textSize="14sp" />
 
-        <!-- Post Media Button  -->
-        <ImageButton
-            android:id="@+id/post_btn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="25dp"
-            android:backgroundTint="@color/white"
-            android:contentDescription="@string/post"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            app:srcCompat="@drawable/ic_post" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
 
-    <!-- Fragment Container -->
+    </androidx.appcompat.widget.Toolbar>
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_above="@id/bottom"
+        android:layout_marginBottom="2dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="162dp"
+            android:layout_height="65dp"
+            android:background="@color/dark_green"
+            android:paddingStart="15dp"
+            android:paddingTop="15dp"
+            app:elevation="0dp"
+            app:labelVisibilityMode="unlabeled"
+            app:menu="@menu/bottom_navigation"
+            android:backgroundTint="@color/yellow"/>
+    </FrameLayout>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+</RelativeLayout>

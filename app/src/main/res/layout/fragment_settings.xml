@@ -5,43 +5,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.view.MainActivity"
+    tools:context=".ui.MainActivity"
     android:background="@color/grey">
 
     <!-- Top Block Layout -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/top_block"
+    <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="@color/red"
+        android:layout_height="65dp"
+        android:backgroundTint="@color/red"
+        android:id="@+id/toolbar"
+        android:background="?android:attr/windowBackground"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Return to Main Button  -->
-        <Button
-            android:id="@+id/settings_to_main_btn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="25dp"
-            android:backgroundTint="@color/white"
-            android:text="@string/greater_than"
-            android:textColor="@color/blue"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- Settings Header  -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SETTINGS"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- LinearLayout containing Settings Buttons -->
     <LinearLayout
@@ -51,7 +45,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/top_block">
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <!-- Generate One-Time Code Button  -->
         <Button
@@ -59,7 +53,17 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:backgroundTint="@color/white"
-            android:text="@string/generate_one_time_code"
+            android:text="generate one time code"
+            android:textColor="@color/blue" />
+
+        <!-- Edit Profile Button  -->
+        <Button
+            android:id="@+id/edit_profile_btn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/white"
+            android:text="edit profile"
             android:textColor="@color/blue" />
 
         <!-- Manage Family Button  -->
@@ -69,7 +73,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/white"
-            android:text="@string/manage_family"
+            android:text="manage family"
             android:textColor="@color/blue" />
 
         <!-- Leave Family Button  -->
@@ -79,7 +83,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/white"
-            android:text="@string/leave_family"
+            android:text="leave family"
             android:textColor="@color/blue" />
 
     </LinearLayout>
