@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:id="@+id/toolbar"
-        android:background="@color/red">
+        android:background="@color/dark_green">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -18,34 +18,45 @@
 
             <Button
                 android:id="@+id/view_collection_btn"
+                android:layout_marginTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:backgroundTint="@color/blue"
-                android:text="view collection"/>
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="22dp"
+                android:backgroundTint="@color/light_green"
+                android:fontFamily="@font/ptsans"
+                android:text="view collection"
+                android:textSize="14sp" />
 
         </RelativeLayout>
 
     </androidx.appcompat.widget.Toolbar>
+
     <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom"
-        android:id="@+id/fragment_container"/>
+        android:layout_marginBottom="2dp">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="162dp"
+            android:layout_height="65dp"
+            android:background="@color/dark_green"
+            android:paddingStart="15dp"
+            android:paddingTop="15dp"
+            app:elevation="0dp"
+            app:labelVisibilityMode="unlabeled"
+            app:menu="@menu/bottom_navigation"
+            android:backgroundTint="@color/yellow"/>
+    </FrameLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bottom"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/bottom_navigation"
-            app:labelVisibilityMode="unlabeled"
-            android:background="?android:attr/windowBackground"
-            app:menu="@menu/bottom_navigation"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
