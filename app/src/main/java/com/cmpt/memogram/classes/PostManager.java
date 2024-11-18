@@ -115,7 +115,7 @@ public class PostManager {
     }
 
 
-
+    //gets media file from storage
     public void getMedia(String path, final OnGetFileListener listener) {
         StorageReference fileRef = this.sr.child(path);
 
@@ -128,6 +128,7 @@ public class PostManager {
         });
     }
 
+    //returns all post names and calls a callback function once post names are generated
     public void getAllPostNames(final OnGetPostNamesListener listener) {
         CollectionReference postsCollection = this.db.collection("FamilyGroups").document(this.fg).collection("Posts");
 
@@ -148,28 +149,9 @@ public class PostManager {
         });
     }
 
-    // OnUploadFileListener.java
-    public void uploadFile(String filePath, byte[] fileData, final OnUploadFileListener listener) {
-        StorageReference fileRef = this.sr.child(filePath);
 
-        fileRef.putBytes(fileData)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // File uploaded successfully
-                    fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        // File download URL retrieved successfully
-                        listener.onSuccess(uri.toString());
-                    }).addOnFailureListener(exception -> {
-                        // Handle any errors
-                        listener.onFailure();
-                    });
-                })
-                .addOnFailureListener(exception -> {
-                    // Handle any errors
-                    listener.onFailure();
-                });
-    }
-
-    public void uploadPost(String title, String text, byte[] audioData, byte[] imageData, String userID, final OnUploadPostListener listener) {
+    // uploads a post to the database
+    public void uploadPost(String title, String text, byte[] audioData, byte[] imageData, final OnUploadPostListener listener) {
         // Upload audio file
         String audioFilePath = fg + "/" + UUID.randomUUID().toString()+ "." + "mp3";
         String imageFilePath = fg + "/" + UUID.randomUUID().toString()+ "." + "jpeg";
@@ -197,7 +179,7 @@ public class PostManager {
                                         newPost.imagePath = imageFilePath;
                                         newPost.text = text;
                                         newPost.title = title;
-                                        newPost.posterID = userID;
+                                        newPost.posterID = this.userID;
                                         newPost.datePosted = new Date();
                                         // Save post to Firestore
                                         this.db.collection("FamilyGroups").document(this.fg).collection("Posts")

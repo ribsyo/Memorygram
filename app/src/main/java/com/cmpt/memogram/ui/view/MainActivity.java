@@ -135,18 +135,20 @@ public class MainActivity extends AppCompatActivity {
         }
             String userID = "testUser";
 
-        /*
-        postManager.uploadPost(title, text, audioData, imageData, userID, new OnUploadPostListener() {
+
+        postManager.uploadPost(title, text, audioData, imageData, new OnUploadPostListener() {
             @Override
             public void onSuccess() {
                 System.out.println("Post uploaded successfully.");
+
             }
 
             @Override
             public void onFailure() {
                 System.out.println("Failed to upload post.");
+
             }
-        });*/
+        });
     }
 
     public byte[] loadFileAsBytes(String filePath) throws IOException {
