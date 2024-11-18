@@ -1,0 +1,95 @@
+package com.cmpt.memogram.classes;
+
+import android.util.Log;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class UserManager {
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Map<String, String> userDoc = new HashMap<>();
+
+    //Returns a bool dependent on if a user is logged in
+    public boolean loginStatus() {
+        return  mAuth.getCurrentUser() != null;
+    }
+
+    //Gets User ID if user is logged in
+    public String getID() {
+        if (mAuth.getCurrentUser() != null) {
+            return mAuth.getCurrentUser().getUid();
+        }
+        return "";
+    }
+
+    //Logs in with provided credentials returns true on success
+    public boolean login (String username, String password) {
+        mAuth.signInWithEmailAndPassword(username, password)
+                .addOnCompleteListener(login -> {
+                    if (login.isSuccessful()) {
+                        // Sign in success, updates app variables with user info
+                        Log.d("login", "loginWithEmail:success");
+                        getUserDoc();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("login", "loginUserWithEmail:failure", login.getException());
+                    }
+                });
+        return mAuth.getCurrentUser() != null;
+    }
+
+    //populate userMap
+    public void getUserDoc() {
+        DocumentReference docRef = db.collection("Users")
+                .document(getID());
+        docRef.get().addOnCompleteListener(getUser -> {
+            if (getUser.isSuccessful()) {
+                DocumentSnapshot document = getUser.getResult();
+                if (document.exists()) {
+                    userDoc.put("name", document.getString("name"));
+                    userDoc.put("groupID", document.getString("groupID"));
+                    return;
+                } else {
+                    Log.d("getUser", "No such document");
+                }
+            } else {
+                Log.d("getUser", "get failed with ", getUser.getException());
+            }
+        });
+    }
+
+    //Get name of User
+    public String getName() {
+        if (mAuth.getCurrentUser() != null) {
+            getUserDoc();
+            return userDoc.get("name");
+        }
+        return null;
+    }
+
+    //Get groupID of User
+    public String getGroupID() {
+        if (mAuth.getCurrentUser() != null) {
+            getUserDoc();
+            return userDoc.get("groupID");
+        }
+        return null;
+    }
+
+
+    //Joins a group by groupID
+    public void joinGroup (String groupJoinID) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("groupID", groupJoinID);
+        db.collection("Users").document(getID())
+                .set(data, SetOptions.merge());
+    }
+}
