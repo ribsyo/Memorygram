@@ -129,7 +129,7 @@ public class PostFragment extends Fragment {
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "testGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, new byte[1], imageBytes, new OnUploadPostListener() {
+                    postManager.uploadPost(title, caption, audioBytes, imageBytes, new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
