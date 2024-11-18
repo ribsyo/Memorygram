@@ -8,7 +8,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="70dp"
         android:id="@+id/toolbar"
         android:background="@color/dark_green">
 
@@ -16,21 +16,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/view_collection_btn"
                 android:layout_marginTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="22dp"
-                android:backgroundTint="@color/light_green"
+                android:backgroundTint="@color/yellow"
                 android:fontFamily="@font/ptsans"
                 android:text="view collection"
-                android:textSize="14sp" />
+                android:drawableLeft="@drawable/ic_view_collection"
+                android:drawableTint="@color/white"
+                android:textSize="14sp"
+                app:cornerRadius="20dp"/>
 
         </RelativeLayout>
 
     </androidx.appcompat.widget.Toolbar>
+
+    <View
+        android:id="@+id/view_line"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/grey"
+        android:layout_marginTop="70dp"
+        android:elevation="2dp"/>
 
     <FrameLayout
         android:id="@+id/fragment_container"
@@ -49,7 +60,7 @@
             app:elevation="0dp"
             app:labelVisibilityMode="unlabeled"
             app:menu="@menu/bottom_navigation"
-            android:backgroundTint="@color/yellow"/>
+            app:itemIconTint="@color/yellow"/>
     </FrameLayout>
 
     <com.google.android.material.appbar.AppBarLayout

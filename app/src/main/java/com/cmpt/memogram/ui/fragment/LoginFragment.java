@@ -30,6 +30,11 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        View viewLine = getActivity().findViewById(R.id.view_line);
+        if (viewLine != null) {
+            viewLine.setVisibility(View.GONE);
+        }
+
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         EditText emailEditText = view.findViewById(R.id.username);
@@ -80,6 +85,17 @@ public class LoginFragment extends Fragment {
                 }
             });
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // Show the view line when the LoginFragment is destroyed
+        View viewLine = getActivity().findViewById(R.id.view_line);
+        if (viewLine != null) {
+            viewLine.setVisibility(View.VISIBLE);
+        }
     }
 
 
