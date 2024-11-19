@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/dark_green"
     tools:context=".ui.MainActivity"
     android:layout_marginTop="65dp">
 
@@ -22,11 +22,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:fontFamily="@font/ptsans"
+                android:fontFamily="@font/nunito"
                 android:text="CREATE POST"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:paddingTop="16dp" />
 
         </RelativeLayout>
 
@@ -45,7 +46,8 @@
             android:padding="16dp">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="350dp"
                 android:layout_height="200dp"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
@@ -63,7 +65,8 @@
             </androidx.cardview.widget.CardView>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="WRITE TITLE"
@@ -80,12 +83,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/ptsans"
+                    android:textSize="14sp"
                     android:textColor="@color/dark_green" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="WRITE CAPTION"
@@ -99,6 +104,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/AddCaption"
+                    android:textSize="14sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/ptsans"
@@ -107,7 +113,8 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:hint="ADD TAGS"
@@ -124,6 +131,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/ptsans"
+                    android:textSize="14sp"
                     android:textColor="@color/dark_green" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -137,47 +145,55 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/Audio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_width="165dp"
+                    android:layout_height="75dp"
+                    android:layout_marginEnd="20dp"
                     android:backgroundTint="@color/light_green"
-                    android:text="AUDIO"
-                    android:textColor="@color/yellow"
+                    android:text="RECORD AUDIO"
+                    android:textColor="@color/white"
                     android:fontFamily="@font/ptsans"
                     app:cornerRadius="8dp"
                     app:elevation="4dp"
+                    android:textSize="14sp"
                     app:strokeColor="@color/dark_green"
+                    android:drawableLeft="@drawable/ic_record_audio"
+                    android:drawableTint="@color/yellow"
                     app:strokeWidth="1dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/PlayBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="165dp"
+                    android:layout_height="75dp"
                     android:backgroundTint="@color/light_green"
                     android:fontFamily="@font/ptsans"
-                    android:text="PLAYBACK"
-                    android:textColor="@color/yellow"
+                    android:text="AUDIO PLAYBACK"
+                    android:textColor="@color/white"
                     app:cornerRadius="8dp"
                     app:elevation="4dp"
+                    android:textSize="14sp"
                     app:strokeColor="@color/dark_green"
-                    app:strokeWidth="1dp" />
+                    app:strokeWidth="1dp"
+                    android:drawableLeft="@drawable/ic_playback"
+                    android:drawableTint="@color/yellow" />
 
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/Post"
-                android:layout_width="170dp"
-                android:layout_height="80dp"
+                android:layout_width="200dp"
+                android:layout_height="75dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/light_green"
                 android:fontFamily="@font/ptsans"
                 android:text="POST"
-                android:textColor="@color/yellow"
-                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:textSize="14sp"
                 app:cornerRadius="12dp"
-                app:elevation="4dp"
-                app:strokeColor="@color/dark_green"
-                app:strokeWidth="2dp" />
+                android:drawableLeft="@drawable/ic_upload"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/yellow"
+                android:paddingStart="60dp"
+                android:paddingEnd="60dp"/>
 
         </LinearLayout>
 
