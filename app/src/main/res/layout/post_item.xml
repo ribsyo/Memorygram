@@ -8,98 +8,130 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/dark_green"
-        android:padding="10dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="2dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:background="@color/white"
-            android:padding="8dp">
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/title"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:textSize="24sp"
-                android:textColor="@color/black"
+                android:layout_width="308dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="25dp"
                 android:fontFamily="@font/nunito"
-                android:text="Title"/>
+                android:text="TITLE"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/post_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="15dp"
                 android:fontFamily="@font/ptsans"
-                android:textColor="@color/grey"
+                android:text="POSTED DATE"
+                android:textColor="@color/sage"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/post_image"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:src="@mipmap/cat"/>
+            <FrameLayout
+                android:layout_width="344dp"
+                android:layout_height="225dp"
+                android:layout_gravity="center"
+                android:background="@color/light_black">
+
+                <ImageView
+                    android:id="@+id/post_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/cat" />
+            </FrameLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="376dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="15dp"
+                android:paddingTop="10dp">
 
-                <TextView
-                    android:id="@+id/poster"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="7.5dp"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="10dp"
+                    android:src="@mipmap/cat" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@color/blue"
-                    android:fontFamily="@font/ptsans"
-                    android:gravity="center"
-                    android:paddingHorizontal="50dp"
-                    android:text="JAMES"
-                    android:letterSpacing="0.1"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/poster"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
+                        android:gravity="start"
+                        android:letterSpacing="0.1"
+                        android:text="JAMES"
+                        android:textAlignment="textStart"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/role"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ptsans"
+                        android:gravity="start"
+                        android:letterSpacing="0.1"
+                        android:text="GRANDSON"
+                        android:textAlignment="textStart"
+                        android:textColor="@color/sage"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/play_audio"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="7.5dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/light_green"
+                    android:backgroundTint="@color/blue"
+                    android:drawableLeft="@drawable/ic_play_audio"
+                    android:drawableTint="@color/yellow"
                     android:fontFamily="@font/ptsans"
                     android:gravity="center"
-                    android:paddingHorizontal="25dp"
+                    android:paddingHorizontal="20dp"
                     android:text="Play Audio"
-                    android:textSize="12sp"
-                    android:drawableLeft="@drawable/ic_play_audio"
-                    android:drawableTint="@color/yellow"/>
-
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
                 android:id="@+id/description"
-                android:text="description"
+                android:layout_width="343dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="40dp"
                 android:fontFamily="@font/ptsans"
-                android:textColor="@color/black"/>
+                android:text="DESCRIPTION"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

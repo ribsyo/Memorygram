@@ -1,9 +1,13 @@
 package com.cmpt.memogram.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,7 +28,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private final Context mContext;
     private final List<Post> mPosts;
 
-    // Constructor to initialize context and post list
     public PostAdapter(Context context, List<Post> posts) {
         mContext = context;
         mPosts = posts;
@@ -33,7 +36,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the layout for each item in the RecyclerView
         View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
         return new ViewHolder(view);
     }
@@ -47,6 +49,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.postDate.setText(getRelativeTime(post.datePosted));
 
             String imageUrl = post.imageDownloadLink;
+            String audioUrl = post.audioDownloadLink; // Assuming you have an audio URL in the Post class
+
             System.out.println("Loading image URL: " + imageUrl);
 
             if (imageUrl == null || imageUrl.isEmpty()) {
@@ -56,6 +60,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         .load(imageUrl)
                         .into(holder.postImage);
             }
+
+            holder.postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
+
+            holder.playAudio.setOnClickListener(v -> playAudio(audioUrl));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error in onBindViewHolder: " + e.getMessage());
@@ -64,15 +72,39 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        // Return the total number of items in the list
         return mPosts.size();
+    }
+
+    private void showFullScreenImage(String imageUrl) {
+        Dialog dialog = new Dialog(mContext, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        dialog.setContentView(R.layout.dialog_fullscreen_image);
+        ImageView fullscreenImage = dialog.findViewById(R.id.fullscreen_image);
+        ImageButton closeButton = dialog.findViewById(R.id.close_button);
+
+        Glide.with(mContext).load(imageUrl).into(fullscreenImage);
+
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void playAudio(String audioUrl) {
+        try {
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(audioUrl);
+            mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+            mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+            mediaPlayer.prepareAsync();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error playing audio: " + e.getMessage());
+        }
     }
 
     public String getRelativeTime(String datePosted) {
         try {
             long postTime;
             if (datePosted.contains("Timestamp")) {
-                // Assuming datePosted is in the format "Timestamp(seconds=..., nanoseconds=...)"
                 String[] parts = datePosted.split("[=,)]");
                 long seconds = Long.parseLong(parts[1].trim());
                 postTime = seconds * 1000;
@@ -113,14 +145,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public TextView title;
         public ImageView postImage;
         public TextView postDate;
+        public Button playAudio;
 
-        // ViewHolder constructor to initialize views
         public ViewHolder(View itemView) {
             super(itemView);
             description = itemView.findViewById(R.id.description);
             title = itemView.findViewById(R.id.title);
             postImage = itemView.findViewById(R.id.post_image);
             postDate = itemView.findViewById(R.id.post_date);
+            playAudio = itemView.findViewById(R.id.play_audio);
         }
     }
 }
