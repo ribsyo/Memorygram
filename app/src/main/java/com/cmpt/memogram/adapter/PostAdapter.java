@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,9 +50,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.postDate.setText(getRelativeTime(post.datePosted));
 
             String imageUrl = post.imageDownloadLink;
-            String audioUrl = post.audioDownloadLink; // Assuming you have an audio URL in the Post class
-
-            System.out.println("Loading image URL: " + imageUrl);
+            String audioUrl = post.audioDownloadLink;
 
             if (imageUrl == null || imageUrl.isEmpty()) {
                 System.out.println("Error: Image URL is null or empty");
@@ -64,6 +63,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
 
             holder.playAudio.setOnClickListener(v -> playAudio(audioUrl));
+
+            holder.editPostBtn.setOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(mContext, holder.editPostBtn);
+                popupMenu.inflate(R.menu.popup_menu);
+//                popupMenu.setOnMenuItemClickListener(item -> {
+//                    switch (item.getItemId()) {
+//                        case R.id.edit:
+//                            // Handle edit action
+//                            return true;
+//                        case R.id.delete:
+//                            // Handle delete action
+//                            return true;
+//                        default:
+//                            return false;
+//                    }
+//                });
+                popupMenu.show();
+            });
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error in onBindViewHolder: " + e.getMessage());
@@ -146,6 +163,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public ImageView postImage;
         public TextView postDate;
         public Button playAudio;
+        public ImageView editPostBtn;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -154,6 +172,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             postImage = itemView.findViewById(R.id.post_image);
             postDate = itemView.findViewById(R.id.post_date);
             playAudio = itemView.findViewById(R.id.play_audio);
+            editPostBtn = itemView.findViewById(R.id.edit_post_btn);
         }
     }
 }
