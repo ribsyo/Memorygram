@@ -54,19 +54,25 @@ public class UserManager {
     }
 
     // Logs in with provided credentials returns true on success
-    public boolean login(String username, String password) {
+    public interface onLoginListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void login(String username, String password, onLoginListener listener) {
         mAuth.signInWithEmailAndPassword(username, password)
                 .addOnCompleteListener(login -> {
                     if (login.isSuccessful()) {
                         // Sign in success, updates app variables with user info
                         Log.d("login", "loginWithEmail:success");
                         getUserDoc();
+                        listener.onSuccess();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("login", "loginUserWithEmail:failure", login.getException());
+                        listener.onFailure();
                     }
                 });
-        return loginStatus();
+        loginStatus();
     }
     public void logout() {
         mAuth.signOut();

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.cmpt.memogram.classes.UserManager;
+
+import android.util.Log;
 import android.util.Pair;
 
 public class LoginViewModel extends ViewModel {
@@ -38,8 +40,19 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login() {
-        boolean success = userManager.login(username.getValue(), password.getValue());
-        loginSuccess.setValue(success);
+        userManager.login(username.getValue(), password.getValue(), new UserManager.onLoginListener() {
+            @Override
+            public void onSuccess() {
+                loginSuccess.setValue(true);
+                Log.d("LOGIN", "success");
+            }
+
+            @Override
+            public void onFailure() {
+                loginSuccess.setValue(false);
+                Log.d("LOGIN", "fail");
+            }
+        });
     }
 
     public void signUp(String username, String password) {
