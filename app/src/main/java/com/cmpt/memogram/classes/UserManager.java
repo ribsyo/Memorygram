@@ -157,7 +157,7 @@ public class UserManager {
     }
     public void joinGroup(String groupJoinCode, onJoinGroupListener listener) {
         DocumentReference docRef = db.collection("Invites")
-                .document(groupJoinCode);
+                .document(groupJoinCode.toUpperCase());
         docRef.get().addOnCompleteListener(getGroup -> {
             if (getGroup.isSuccessful()) {
                 DocumentSnapshot document = getGroup.getResult();
@@ -176,7 +176,7 @@ public class UserManager {
                             .document(groupJoinID).collection("Members")
                             .document(getID())
                             .set(groupUpdate, SetOptions.merge());
-                    db.collection("Invites").document(groupJoinCode).delete();
+                    db.collection("Invites").document(groupJoinCode.toUpperCase()).delete();
                     listener.onSuccess();
                 } else {
                     Log.d("joinGroup", "No such invite document");
