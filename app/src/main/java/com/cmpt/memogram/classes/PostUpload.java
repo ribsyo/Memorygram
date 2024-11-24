@@ -5,8 +5,10 @@ public class PostUpload {
     public String title;
     public String text;
     public Date datePosted;
+    public Date dateListed;
+    boolean includeAudio;
+    public String tag;
     public String audioPath;
     public String imagePath;
     public String posterID;
-
 }
