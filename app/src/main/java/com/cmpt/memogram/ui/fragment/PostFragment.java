@@ -108,6 +108,9 @@ public class PostFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (selectedImageUri != null) {
+
+                    postButton.setEnabled(false);
+
                     String caption = captionEditText.getText().toString();
                     String tags = tagsEditText.getText().toString();
                     String title = titleEditText.getText().toString();
@@ -135,14 +138,25 @@ public class PostFragment extends Fragment {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
-                            getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, new HomeFragment())
-                                    .commit();
+                            if (getActivity() != null) {
+                                getActivity().getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container, new HomeFragment())
+                                        .commit();
+                            }
                         }
 
                         @Override
                         public void onFailure() {
                             System.out.println("Failed to upload post.");
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        postButton.setEnabled(true);
+                                        Toast.makeText(getContext(), "Failed to upload post. Please try again.", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
                     });
 
