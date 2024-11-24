@@ -10,6 +10,8 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class UserManager {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -158,15 +160,57 @@ public class UserManager {
                         .w("Create Group", "Error adding document"));
     }
 
+    // Creates invite code
+    public interface onGetInviteCodeListener {
+        void onSuccess(String groupCode);
+        void onFailure();
+    }
+    public void getInviteCode(final onGetInviteCodeListener listener) {
+        if (getGroupID() == null || getGroupID() == "") {
+            Log.d("getInviteCode", "groupID null or blank");
+            listener.onFailure();
+        }
+
+        AtomicReference<String> groupCode = new AtomicReference<>(randomCode());
+        DocumentReference docRef = db.collection("Invites")
+                .document(randomCode());
+        docRef.get().addOnCompleteListener(checkCode -> {
+            if (checkCode.isSuccessful()) {
+                DocumentSnapshot document = checkCode.getResult();
+                if (document.exists()) {
+                    getInviteCode(listener);
+                } else {
+                    Map<String, String> newInvite= new HashMap<>();
+                    newInvite.put("groupID", getGroupID());
+                    db.collection("Invites").document(groupCode.get())
+                            .set(newInvite, SetOptions.merge());
+                    listener.onSuccess(groupCode.get());
+                }
+            } else {
+                Log.d("getInviteCode", "get failed with ", checkCode.getException());
+                listener.onFailure();
+            }
+        });
+    }
+
+
+    //generates random string for invite code
+    //helper function for getInviteCode
+    String randomCode() {
+        StringBuilder code = new StringBuilder();
+        String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            int codeLength = 4;
+
+        for (int i = 0; i < codeLength; i++) {
+            code.append(alpha.charAt((int) Math.floor(Math.random() * 26)));
+        }
+        Log.d("randomCode", code.toString());
+        return code.toString();
+    };
     // TODO: Output members of group
     // public String[] getGroupMembers() {
     //   return null;
     // }
-    // Outputs group id for invite function,
-    // TODO: add functionality for one time join code?
-    public String getGroupCode() {
-        return getGroupID();
-    }
 
     // TODO: Add invite functionality.
     //
