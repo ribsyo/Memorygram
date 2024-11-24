@@ -10,7 +10,7 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UserManager {
@@ -112,7 +112,11 @@ public class UserManager {
     }
 
     // Joins a group by invite code string
-    public void joinGroup(String groupJoinCode) {
+    public interface onJoinGroupListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void joinGroup(String groupJoinCode, onJoinGroupListener listener) {
         DocumentReference docRef = db.collection("Invites")
                 .document(groupJoinCode);
         docRef.get().addOnCompleteListener(getGroup -> {
@@ -134,11 +138,14 @@ public class UserManager {
                             .document(getID())
                             .set(groupUpdate, SetOptions.merge());
                     db.collection("Invites").document(groupJoinCode).delete();
+                    listener.onSuccess();
                 } else {
                     Log.d("joinGroup", "No such invite document");
+                    listener.onFailure();
                 }
             } else {
-                Log.d("joinGroup", "get failed with ", getGroup.getException());
+                Log.d("joinGroup", "Get failed with ", getGroup.getException());
+                listener.onFailure();
             }
         });
 
@@ -172,7 +179,17 @@ public class UserManager {
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
                             .set(admin, SetOptions.merge());
-                    joinGroup(createdGroupID);
+                    joinGroup(createdGroupID, new onJoinGroupListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d("createGroup", "Created and joined");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Log.d("createGroup", "Failed");
+                        }
+                    });
                 })
                 .addOnFailureListener(fail -> Log
                         .w("Create Group", "Error adding document"));
@@ -184,7 +201,7 @@ public class UserManager {
         void onFailure();
     }
     public void getInviteCode(final onGetInviteCodeListener listener) {
-        if (getGroupID() == null || getGroupID() == "") {
+        if (getGroupID() == null || Objects.equals(getGroupID(), "")) {
             Log.d("getInviteCode", "groupID null or blank");
             listener.onFailure();
         }
@@ -224,7 +241,7 @@ public class UserManager {
         }
         Log.d("randomCode", code.toString());
         return code.toString();
-    };
+    }
     // TODO: Output members of group
     // public String[] getGroupMembers() {
     //   return null;
