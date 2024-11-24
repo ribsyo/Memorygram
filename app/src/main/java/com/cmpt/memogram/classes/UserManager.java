@@ -20,7 +20,16 @@ public class UserManager {
 
     public UserManager() {
         if (getID() != null) {
-            this.getUserDoc();
+            this.getUserDoc(new onGetUserDocListener() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    Log.d("userMan initialize", message);
+                }
+            });
         }
     }
 
@@ -54,25 +63,47 @@ public class UserManager {
     }
 
     // Logs in with provided credentials returns true on success
-    public boolean login(String username, String password) {
+    public interface onLoginListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void login(String username, String password, onLoginListener listener) {
         mAuth.signInWithEmailAndPassword(username, password)
                 .addOnCompleteListener(login -> {
                     if (login.isSuccessful()) {
                         // Sign in success, updates app variables with user info
                         Log.d("login", "loginWithEmail:success");
-                        getUserDoc();
+                        getUserDoc(new onGetUserDocListener() {
+                            @Override
+                            public void onSuccess() {
+                                listener.onSuccess();
+                            }
+
+                            @Override
+                            public void onFailure(String message) {
+                                Log.d("login", message);
+                            }
+                        });
+                        listener.onSuccess();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("login", "loginUserWithEmail:failure", login.getException());
+                        listener.onFailure();
                     }
                 });
-        return loginStatus();
+        loginStatus();
     }
+
     public void logout() {
         mAuth.signOut();
     }
 
-    public boolean register(String username, String password, String name) {
+    // Logs in with provided credentials returns true on success
+    public interface onRegisterListener {
+        void onSuccess();
+        void onFailure(String message);
+    }
+    public void register(String username, String password, String name, onRegisterListener listener) {
         mAuth.createUserWithEmailAndPassword(username, password)
                 .addOnCompleteListener(register -> {
                     if (register.isSuccessful()) {
@@ -84,16 +115,21 @@ public class UserManager {
 
                         db.collection("Users").document(getID())
                                 .set(newUser, SetOptions.merge());
+                        listener.onSuccess();
                     } else {
                         // If sign in fails, display a message to the user.
-                        Log.w("register", "createUserWithEmail:failure", register.getException());
+                        Log.w("register", "createUserWithEmail:failure ", register.getException());
+                        listener.onFailure(register.getException().getMessage());
                     }
                 });
-        return loginStatus();
     }
 
     // Populate userMap
-    private void getUserDoc() {
+    public interface onGetUserDocListener {
+        void onSuccess();
+        void onFailure(String message);
+    }
+    private void getUserDoc(onGetUserDocListener listener) {
         DocumentReference docRef = db.collection("Users")
                 .document(getID());
         docRef.get().addOnCompleteListener(getUser -> {
@@ -102,11 +138,14 @@ public class UserManager {
                 if (document.exists()) {
                     userDoc.put("name", document.getData().get("name"));
                     userDoc.put("groupID", document.getData().get("groupID"));
+                    listener.onSuccess();
                 } else {
                     Log.d("getUser", "No such document");
+                    listener.onFailure("No such document");
                 }
             } else {
                 Log.d("getUser", "get failed with ", getUser.getException());
+                listener.onFailure(getUser.getException().getMessage());
             }
         });
     }
@@ -152,21 +191,38 @@ public class UserManager {
     }
 
     // Leaves group user is currently in
-    public void leaveGroup() {
+    public interface onLeaveGroupListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void leaveGroup(onLeaveGroupListener listener) {
         // Update group
         db.collection("FamilyGroups")
                 .document(getGroupID()).collection("Members").document(getID())
-                .delete();
+                .delete().addOnCompleteListener(delete -> {
+                    if(!delete.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                });
 
         // Update user
         Map<String, Object> userUpdate = new HashMap<>();
         userUpdate.put("groupID", "");
         db.collection("Users").document(getID())
-                .set(userUpdate, SetOptions.merge());
+                .set(userUpdate, SetOptions.merge()).addOnCompleteListener(delete -> {
+                    if(!delete.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                });
+        listener.onSuccess();
     }
 
     // Creates a group
-    public void createGroup(String name) {
+    public interface onCreateGroupListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void createGroup(String name, onCreateGroupListener listener) {
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
@@ -183,16 +239,20 @@ public class UserManager {
                         @Override
                         public void onSuccess() {
                             Log.d("createGroup", "Created and joined");
+                            listener.onSuccess();
                         }
 
                         @Override
                         public void onFailure() {
                             Log.d("createGroup", "Failed");
+                            listener.onFailure();
                         }
                     });
                 })
-                .addOnFailureListener(fail -> Log
-                        .w("Create Group", "Error adding document"));
+                .addOnFailureListener(fail -> {
+                    Log.w("Create Group", "Error adding document");
+                    listener.onFailure();
+                });
     }
 
     // Creates invite code
