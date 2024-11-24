@@ -110,9 +110,14 @@ public class PostFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (selectedImageUri != null) {
+
+                    postButton.setEnabled(false);
+
                     String caption = captionEditText.getText().toString();
-                    String tags = tagsEditText.getText().toString();
+                    String tags = tagsEditText.getText().toString().trim();
                     String title = titleEditText.getText().toString();
+
+                    String finalTags = tags.isEmpty() ? "none" : tags;
 
                     prepareImageBytes();
                     prepareAudioBytes();
@@ -120,7 +125,7 @@ public class PostFragment extends Fragment {
                     PostData postData = new PostData(
                             imageBytes,
                             caption,
-                            tags,
+                            finalTags,
                             audioBytes
                     );
 
@@ -133,18 +138,29 @@ public class PostFragment extends Fragment {
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, imageBytes, "none", new Date(), new OnUploadPostListener() {
+                    postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
-                            getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, new HomeFragment())
-                                    .commit();
+                            if (getActivity() != null) {
+                                getActivity().getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container, new HomeFragment())
+                                        .commit();
+                            }
                         }
 
                         @Override
                         public void onFailure() {
                             System.out.println("Failed to upload post.");
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        postButton.setEnabled(true);
+                                        Toast.makeText(getContext(), "Failed to upload post. Please try again.", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
                     });
 
