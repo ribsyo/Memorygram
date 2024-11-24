@@ -48,19 +48,54 @@
             <androidx.cardview.widget.CardView
                 android:layout_gravity="center"
                 android:layout_width="350dp"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
 
-                <ImageButton
-                    android:id="@+id/imageButton"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/grey"
-                    android:contentDescription="UPLOAD IMAGE"
-                    android:scaleType="centerInside"
-                    tools:srcCompat="@android:drawable/stat_sys_upload_done" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <HorizontalScrollView
+                        android:id="@+id/scrollView"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@color/grey">
+
+                        <LinearLayout
+                            android:id="@+id/imagePreviewContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="8dp">
+
+                            <ImageButton
+                                android:id="@+id/imageButton"
+                                android:layout_width="180dp"
+                                android:layout_height="180dp"
+                                android:background="@color/grey"
+                                android:contentDescription="UPLOAD IMAGE"
+                                android:scaleType="centerInside"
+                                tools:srcCompat="@android:drawable/stat_sys_upload_done" />
+
+                        </LinearLayout>
+
+                    </HorizontalScrollView>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Long press on image to delete"
+                        android:textAlignment="center"
+                        android:padding="8dp"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/ptsans"
+                        android:textColor="@color/dark_green"/>
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 

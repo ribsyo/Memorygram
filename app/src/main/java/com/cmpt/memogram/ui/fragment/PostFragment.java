@@ -18,6 +18,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.PostManager;
@@ -28,23 +31,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import android.Manifest;
 import android.database.Cursor;
 
 public class PostFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PERMISSION_REQUEST_CODE = 200;
-    private ImageButton imageButton;
+    private ImageButton addImageButton;
+    private LinearLayout imagePreviewContainer;
+    private HorizontalScrollView scrollView;
     private EditText captionEditText;
     private EditText tagsEditText;
     private EditText titleEditText;
     private Button postButton;
     private Button audioButton;
     private Button playbackButton;
-    private Uri selectedImageUri;
-    private byte[] imageBytes;
+
+    private List<Uri> selectedImageUris;
+    private List<byte[]> imageBytesList;
+    private List<String> imageFileNames;
     private byte[] audioBytes;
-    private String selectedImageFileName;
 
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
@@ -52,12 +60,21 @@ public class PostFragment extends Fragment {
     private boolean isRecording = false;
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_post, container, false);
 
-        imageButton = view.findViewById(R.id.imageButton);
+        // Initialize lists
+        selectedImageUris = new ArrayList<>();
+        imageBytesList = new ArrayList<>();
+        imageFileNames = new ArrayList<>();
+
+        // Initialize views
+        addImageButton = view.findViewById(R.id.imageButton);
+        imagePreviewContainer = view.findViewById(R.id.imagePreviewContainer);
+        scrollView = view.findViewById(R.id.scrollView);
         captionEditText = view.findViewById(R.id.AddCaption);
         tagsEditText = view.findViewById(R.id.AddTags);
         titleEditText = view.findViewById(R.id.AddTitle);
@@ -65,7 +82,7 @@ public class PostFragment extends Fragment {
         audioButton = view.findViewById(R.id.Audio);
         playbackButton = view.findViewById(R.id.PlayBack);
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openGallery();
@@ -103,27 +120,25 @@ public class PostFragment extends Fragment {
             }
         });
 
-        // Set click listener for post button
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedImageUri != null) {
+                if (!selectedImageUris.isEmpty()) {
                     String caption = captionEditText.getText().toString();
                     String tags = tagsEditText.getText().toString();
                     String title = titleEditText.getText().toString();
 
-                    prepareImageBytes();
+                    prepareAllImagesBytes();
                     prepareAudioBytes();
 
-                    PostData postData = new PostData(
-                            imageBytes,
-                            caption,
-                            tags,
-                            audioBytes
-                    );
+//                    PostData postData = new PostData(
+//                            imageBytesList,
+//                            caption,
+//                            tags,
+//                            audioBytes
+//                    );
+                    byte[] firstImageBytes = imageBytesList.isEmpty() ? null : imageBytesList.get(0);
 
-                    //String title = getFileName(selectedImageUri);
-                    //byte[] audioData = new byte[1];
 
                     Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
 
@@ -131,7 +146,8 @@ public class PostFragment extends Fragment {
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "testGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, audioBytes, imageBytes, new OnUploadPostListener() {
+
+                    postManager.uploadPost(title, caption, audioBytes, firstImageBytes, new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
@@ -145,14 +161,12 @@ public class PostFragment extends Fragment {
                             System.out.println("Failed to upload post.");
                         }
                     });
-
                 } else {
-                    Toast.makeText(getContext(), "Please select an image first", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Please select at least one image", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        // Inflate the layout for this fragment
         return view;
     }
 
@@ -165,13 +179,17 @@ public class PostFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && data != null) {
-            selectedImageUri = data.getData();
-            if (selectedImageUri != null) {
-                imageButton.setImageURI(selectedImageUri);
-                //get file name
-                selectedImageFileName = getFileName(selectedImageUri);
-                if (selectedImageFileName != null) {
-                    Toast.makeText(getContext(), "Selected file: " + selectedImageFileName, Toast.LENGTH_SHORT).show();
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                selectedImageUris.add(imageUri);
+                String fileName = getFileName(imageUri);
+                imageFileNames.add(fileName);
+
+                // Add image preview
+                addImagePreview(imageUri);
+
+                if (fileName != null) {
+                    Toast.makeText(getContext(), "Added image: " + fileName, Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -197,23 +215,55 @@ public class PostFragment extends Fragment {
         return result;
     }
 
-    private void prepareImageBytes() {
-        try {
-            InputStream inputStream = getContext().getContentResolver().openInputStream(selectedImageUri);
-            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+    private void addImagePreview(Uri imageUri) {
+        ImageView imageView = new ImageView(getContext());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                300, // width in pixels
+                300  // height in pixels
+        );
+        params.setMargins(10, 0, 10, 0); // Add margins between images
+        imageView.setLayoutParams(params);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setImageURI(imageUri);
 
-            int bufferSize = 1024;
-            byte[] buffer = new byte[bufferSize];
-            int len;
-            while ((len = inputStream.read(buffer)) != -1) {
-                byteBuffer.write(buffer, 0, len);
+        // Add delete functionality
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int position = imagePreviewContainer.indexOfChild(imageView);
+                selectedImageUris.remove(position);
+                imageFileNames.remove(position);
+                imagePreviewContainer.removeView(imageView);
+                return true;
             }
-            imageBytes = byteBuffer.toByteArray();
+        });
 
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(getContext(), "Error preparing image", Toast.LENGTH_SHORT).show();
+        imagePreviewContainer.addView(imageView);
+    }
+
+    private void prepareAllImagesBytes() {
+        imageBytesList.clear();
+        //for (Uri uri : selectedImageUris) {
+        if (!selectedImageUris.isEmpty()) {
+            Uri firstUri = selectedImageUris.get(0);
+            try {
+                //InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+                InputStream inputStream = getContext().getContentResolver().openInputStream(firstUri);
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+                int bufferSize = 1024;
+                byte[] buffer = new byte[bufferSize];
+                int len;
+                while ((len = inputStream.read(buffer)) != -1) {
+                    byteBuffer.write(buffer, 0, len);
+                }
+                imageBytesList.add(byteBuffer.toByteArray());
+
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Error preparing image: " + getFileName(firstUri), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -331,14 +381,14 @@ public class PostFragment extends Fragment {
     private void resetForm() {
         captionEditText.setText("");
         tagsEditText.setText("");
-        imageButton.setImageResource(android.R.drawable.ic_menu_gallery);
-        selectedImageUri = null;
-        imageBytes = null;
+        imagePreviewContainer.removeAllViews();
+        selectedImageUris.clear();
+        imageBytesList.clear();
+        imageFileNames.clear();
         audioBytes = null;
         audioFilePath = null;
         audioButton.setText("AUDIO");
         playbackButton.setText("PLAYBACK");
-        selectedImageFileName = null;
     }
 
     @Override
@@ -350,23 +400,23 @@ public class PostFragment extends Fragment {
 
 
     public static class PostData {
-        private byte[] imageBytes;
+        private List<byte[]> imageBytesList;
         private String caption;
         private String tags;
         private byte[] audioBytes;
 
-        public PostData(byte[] imageBytes, String caption, String tags, byte[] audioBytes) {
-            this.imageBytes = imageBytes;
+        public PostData(List<byte[]> imageBytesList, String caption, String tags, byte[] audioBytes) {
+            this.imageBytesList = imageBytesList;
             this.caption = caption;
             this.tags = tags;
             this.audioBytes = audioBytes;
         }
 
         // Getters
-        public byte[] getImageBytes() { return imageBytes; }
+        public List<byte[]> getImageBytesList() { return imageBytesList; }
         public String getCaption() { return caption; }
         public String getTags() { return tags; }
-        public byte[] getAudioBytes() {return audioBytes; }
+        public byte[] getAudioBytes() { return audioBytes; }
     }
 
 }
