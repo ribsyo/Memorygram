@@ -24,101 +24,30 @@ import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
-    private static final int VIEW_TYPE_TUTORIAL = 0;
-    private static final int VIEW_TYPE_POST = 1;
     private final Context mContext;
     private final List<Post> mPosts;
-    private boolean isTutorialExpanded = false;
 
     public PostAdapter(Context context, List<Post> posts) {
         mContext = context;
         mPosts = posts;
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        if (position == 0) {
-            return VIEW_TYPE_TUTORIAL;
-        } else {
-            return VIEW_TYPE_POST;
-        }
-    }
-
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == VIEW_TYPE_TUTORIAL) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.tutorial_post_item, parent, false);
-            return new TutorialViewHolder(view);
-        } else {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
-            return new PostViewHolder(view);
-        }
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder.getItemViewType() == VIEW_TYPE_TUTORIAL) {
-            ((TutorialViewHolder) holder).bind();
-        } else {
-            Post post = mPosts.get(position - 1); // Adjust for tutorial item
-            ((PostViewHolder) holder).bind(post);
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mPosts.size() + 1; // +1 for the tutorial item
-    }
-
-    class TutorialViewHolder extends RecyclerView.ViewHolder {
-        TextView tutorialTitle;
-        TextView tutorialDescription;
-
-        public TutorialViewHolder(View itemView) {
-            super(itemView);
-            tutorialTitle = itemView.findViewById(R.id.tutorial_title);
-            tutorialDescription = itemView.findViewById(R.id.tutorial_description);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isTutorialExpanded = !isTutorialExpanded;
-                    tutorialDescription.setVisibility(isTutorialExpanded ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
-
-        public void bind() {
-            tutorialDescription.setVisibility(isTutorialExpanded ? View.VISIBLE : View.GONE);
-        }
-    }
-
-    class PostViewHolder extends RecyclerView.ViewHolder {
-
-        public TextView description;
-        public TextView title;
-        public ImageView postImage;
-        public TextView postDate;
-        public Button playAudio;
-        public ImageView editPostBtn;
-
-        public PostViewHolder(View itemView) {
-            super(itemView);
-            description = itemView.findViewById(R.id.description);
-            title = itemView.findViewById(R.id.title);
-            postImage = itemView.findViewById(R.id.post_image);
-            postDate = itemView.findViewById(R.id.post_date);
-            playAudio = itemView.findViewById(R.id.play_audio);
-            editPostBtn = itemView.findViewById(R.id.edit_post_btn);
-        }
-
-        public void bind(Post post) {
-            description.setText(post.text);
-            title.setText(post.title);
-            postDate.setText(getRelativeTime(post.datePosted));
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        try {
+            Post post = mPosts.get(position);
+            holder.description.setText(post.text);
+            holder.title.setText(post.title);
+            holder.postDate.setText(getRelativeTime(post.datePosted));
 
             String imageUrl = post.imageDownloadLink;
             String audioUrl = post.audioDownloadLink;
@@ -128,19 +57,39 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             } else {
                 Glide.with(mContext)
                         .load(imageUrl)
-                        .into(postImage);
+                        .into(holder.postImage);
             }
 
-            postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
+            holder.postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
 
-            playAudio.setOnClickListener(v -> playAudio(audioUrl));
+            holder.playAudio.setOnClickListener(v -> playAudio(audioUrl));
 
-            editPostBtn.setOnClickListener(v -> {
-                PopupMenu popupMenu = new PopupMenu(mContext, editPostBtn);
+            holder.editPostBtn.setOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(mContext, holder.editPostBtn);
                 popupMenu.inflate(R.menu.popup_menu);
+//                popupMenu.setOnMenuItemClickListener(item -> {
+//                    switch (item.getItemId()) {
+//                        case R.id.edit:
+//                            // Handle edit action
+//                            return true;
+//                        case R.id.delete:
+//                            // Handle delete action
+//                            return true;
+//                        default:
+//                            return false;
+//                    }
+//                });
                 popupMenu.show();
             });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error in onBindViewHolder: " + e.getMessage());
         }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mPosts.size();
     }
 
     private void showFullScreenImage(String imageUrl) {
@@ -204,6 +153,26 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } catch (Exception e) {
             e.printStackTrace();
             return "unknown time";
+        }
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView description;
+        public TextView title;
+        public ImageView postImage;
+        public TextView postDate;
+        public Button playAudio;
+        public ImageView editPostBtn;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            description = itemView.findViewById(R.id.description);
+            title = itemView.findViewById(R.id.title);
+            postImage = itemView.findViewById(R.id.post_image);
+            postDate = itemView.findViewById(R.id.post_date);
+            playAudio = itemView.findViewById(R.id.play_audio);
+            editPostBtn = itemView.findViewById(R.id.edit_post_btn);
         }
     }
 }

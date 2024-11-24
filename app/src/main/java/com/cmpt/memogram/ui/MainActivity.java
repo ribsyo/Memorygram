@@ -2,25 +2,21 @@ package com.cmpt.memogram.ui;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.UserManager;
-import com.cmpt.memogram.ui.fragment.CollectionFragment;
 import com.cmpt.memogram.ui.fragment.HomeFragment;
 import com.cmpt.memogram.ui.fragment.LoginFragment;
 import com.cmpt.memogram.ui.fragment.PostFragment;
 import com.cmpt.memogram.ui.fragment.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.button.MaterialButton;
 
 public class MainActivity extends AppCompatActivity {
     UserManager userManager;
@@ -40,23 +36,17 @@ public class MainActivity extends AppCompatActivity {
         if (userManager.loginStatus()) {
             // User is logged in, proceed to the main content
             createMainContent();
+
         } else {
             // User is not logged in, show the login fragment
             if (savedInstanceState == null) {
+
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, new LoginFragment());
                 transaction.addToBackStack(null); // Optional: add to back stack to allow user to navigate back
                 transaction.commit();
             }
         }
-        // ADDED CODE
-        MaterialButton viewCollectionBtn = findViewById(R.id.view_collection_btn);
-        viewCollectionBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openFragment(new CollectionFragment());
-            }
-        });
     }
 
     public void createMainContent() {
@@ -83,12 +73,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
-    // ADDED CODE
-    private void openFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
+
+
+
 }
