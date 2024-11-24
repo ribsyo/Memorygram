@@ -143,7 +143,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/ptsans"
-                    android:textColor="@color/dark_green" />
+                    android:textColor="@color/dark_green"
+                    android:hint="Hint: Describe the photo or share your thoughts" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
