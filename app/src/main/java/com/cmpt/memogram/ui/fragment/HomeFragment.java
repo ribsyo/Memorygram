@@ -79,7 +79,7 @@ public class HomeFragment extends Fragment {
     private void refreshPosts() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage fs = FirebaseStorage.getInstance();
-        PostManager postManager = new PostManager(db, fs,"testGroup","testUser");
+        PostManager postManager = new PostManager(db, fs,"alexGroup","testUser");
 
         postLists.clear();
         postManager.getAllPostNames(new OnGetPostNamesListener() {
