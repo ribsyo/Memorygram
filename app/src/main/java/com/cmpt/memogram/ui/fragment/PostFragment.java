@@ -1,5 +1,6 @@
 package com.cmpt.memogram.ui.fragment;
 
+import java.util.Date;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import android.Manifest;
 import android.database.Cursor;
+
 
 public class PostFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -129,9 +131,9 @@ public class PostFragment extends Fragment {
 
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     FirebaseStorage fs = FirebaseStorage.getInstance();
-                    PostManager postManager = new PostManager(db, fs, "testGroup", "testUser");
+                    PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, audioBytes, imageBytes, new OnUploadPostListener() {
+                    postManager.uploadPost(title, caption, imageBytes, "none", new Date(), new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
