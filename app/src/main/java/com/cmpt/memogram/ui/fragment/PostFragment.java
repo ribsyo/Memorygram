@@ -52,6 +52,7 @@ public class PostFragment extends Fragment {
     private MediaPlayer mediaPlayer;
     private String audioFilePath;
     private boolean isRecording = false;
+    private boolean hasAudioRecording = false;
 
 
     @Override
@@ -120,14 +121,18 @@ public class PostFragment extends Fragment {
                     String finalTags = tags.isEmpty() ? "none" : tags;
 
                     prepareImageBytes();
-                    prepareAudioBytes();
+                    // Only prepare audio bytes if there's a recording
+                    if (hasAudioRecording) {
+                        prepareAudioBytes();
+                    }
 
-                    PostData postData = new PostData(
-                            imageBytes,
-                            caption,
-                            finalTags,
-                            audioBytes
-                    );
+
+//                    PostData postData = new PostData(
+//                            imageBytes,
+//                            caption,
+//                            finalTags,
+//                            audioBytes
+//                    );
 
                     //String title = getFileName(selectedImageUri);
                     //byte[] audioData = new byte[1];
@@ -138,7 +143,7 @@ public class PostFragment extends Fragment {
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), new OnUploadPostListener() {
+                    OnUploadPostListener uploadListener = new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
@@ -162,7 +167,13 @@ public class PostFragment extends Fragment {
                                 });
                             }
                         }
-                    });
+                    };
+                    // Choose upload method based on audio presence
+                    if (hasAudioRecording) {
+                        postManager.uploadPost(title, caption, audioBytes, imageBytes, finalTags, new Date(), uploadListener);
+                    } else {
+                        postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), uploadListener);
+                    }
 
                 } else {
                     Toast.makeText(getContext(), "Please select an image first", Toast.LENGTH_SHORT).show();
@@ -247,23 +258,35 @@ public class PostFragment extends Fragment {
     }
 
     private void startRecording() {
-        audioFilePath = getContext().getExternalCacheDir().getAbsolutePath() + "/audio_record.mp3";
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mediaRecorder.setOutputFile(audioFilePath);
-
         try {
-            mediaRecorder.prepare();
-            mediaRecorder.start();
-            isRecording = true;
-            audioButton.setText("STOP");
-            Toast.makeText(getContext(), "Recording started", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
+            audioFilePath = getContext().getExternalCacheDir().getAbsolutePath() + "/audio_record.mp3";
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mediaRecorder.setOutputFile(audioFilePath);
+            hasAudioRecording = false;
+
+            try {
+                mediaRecorder.prepare();
+                mediaRecorder.start();
+                isRecording = true;
+                audioButton.setText("STOP");
+                Toast.makeText(getContext(), "Recording started", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                mediaRecorder.release();
+                mediaRecorder = null;
+                isRecording = false;
+                Toast.makeText(getContext(), "Failed to start recording", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getContext(), "Failed to start recording", Toast.LENGTH_SHORT).show();
+            isRecording = false;
+            Toast.makeText(getContext(), "Error initializing recorder", Toast.LENGTH_SHORT).show();
         }
+
+
     }
 
     private void stopRecording() {
@@ -280,6 +303,10 @@ public class PostFragment extends Fragment {
                 Toast.makeText(getContext(), "Error stopping recording", Toast.LENGTH_SHORT).show();
             }
         }
+        hasAudioRecording = true;
+    }
+    private void setHasAudioRecording(boolean hasAudio) {
+        this.hasAudioRecording = hasAudio;
     }
 
     private void playAudio() {
