@@ -66,6 +66,9 @@ public class UserManager {
                 });
         return loginStatus();
     }
+    public void logout() {
+        mAuth.signOut();
+    }
 
     public boolean register(String username, String password, String name) {
         mAuth.createUserWithEmailAndPassword(username, password)
