@@ -133,6 +133,7 @@ public class UserManager {
                             .document(groupJoinID).collection("Members")
                             .document(getID())
                             .set(groupUpdate, SetOptions.merge());
+                    db.collection("Invites").document(groupJoinCode).delete();
                 } else {
                     Log.d("joinGroup", "No such invite document");
                 }
@@ -229,6 +230,4 @@ public class UserManager {
     //   return null;
     // }
 
-    // TODO: Add invite functionality.
-    //
 }
