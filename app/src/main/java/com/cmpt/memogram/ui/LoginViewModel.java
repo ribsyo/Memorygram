@@ -56,7 +56,16 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void signUp(String username, String password) {
-        boolean success = userManager.register(username, password, username);
-        signUpSuccess.setValue(new Pair<>(success, success ? null : "Sign-up failed"));
+        userManager.register(username, password, username, new UserManager.onRegisterListener() {
+            @Override
+            public void onSuccess() {
+                signUpSuccess.setValue(new Pair<>(true, "Sign-up success"));
+            }
+
+            @Override
+            public void onFailure(String message) {
+                signUpSuccess.setValue(new Pair<>(false, message));
+            }
+        });
     }
 }

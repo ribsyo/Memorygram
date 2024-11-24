@@ -74,11 +74,17 @@ public class UserManager {
                 });
         loginStatus();
     }
+
     public void logout() {
         mAuth.signOut();
     }
 
-    public boolean register(String username, String password, String name) {
+    // Logs in with provided credentials returns true on success
+    public interface onRegisterListener {
+        void onSuccess();
+        void onFailure(String message);
+    }
+    public void register(String username, String password, String name, onRegisterListener listener) {
         mAuth.createUserWithEmailAndPassword(username, password)
                 .addOnCompleteListener(register -> {
                     if (register.isSuccessful()) {
@@ -90,12 +96,13 @@ public class UserManager {
 
                         db.collection("Users").document(getID())
                                 .set(newUser, SetOptions.merge());
+                        listener.onSuccess();
                     } else {
                         // If sign in fails, display a message to the user.
-                        Log.w("register", "createUserWithEmail:failure", register.getException());
+                        Log.w("register", "createUserWithEmail:failure ", register.getException());
+                        listener.onFailure(register.getException().getMessage());
                     }
                 });
-        return loginStatus();
     }
 
     // Populate userMap
