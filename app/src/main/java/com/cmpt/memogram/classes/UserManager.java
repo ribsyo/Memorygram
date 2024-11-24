@@ -191,17 +191,30 @@ public class UserManager {
     }
 
     // Leaves group user is currently in
-    public void leaveGroup() {
+    public interface onLeaveGroupListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void leaveGroup(onLeaveGroupListener listener) {
         // Update group
         db.collection("FamilyGroups")
                 .document(getGroupID()).collection("Members").document(getID())
-                .delete();
+                .delete().addOnCompleteListener(delete -> {
+                    if(!delete.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                });
 
         // Update user
         Map<String, Object> userUpdate = new HashMap<>();
         userUpdate.put("groupID", "");
         db.collection("Users").document(getID())
-                .set(userUpdate, SetOptions.merge());
+                .set(userUpdate, SetOptions.merge()).addOnCompleteListener(delete -> {
+                    if(!delete.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                });
+        listener.onSuccess();
     }
 
     // Creates a group
