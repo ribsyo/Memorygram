@@ -20,7 +20,16 @@ public class UserManager {
 
     public UserManager() {
         if (getID() != null) {
-            this.getUserDoc();
+            this.getUserDoc(new onGetUserDocListener() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    Log.d("userMan initialize", message);
+                }
+            });
         }
     }
 
@@ -64,7 +73,17 @@ public class UserManager {
                     if (login.isSuccessful()) {
                         // Sign in success, updates app variables with user info
                         Log.d("login", "loginWithEmail:success");
-                        getUserDoc();
+                        getUserDoc(new onGetUserDocListener() {
+                            @Override
+                            public void onSuccess() {
+                                listener.onSuccess();
+                            }
+
+                            @Override
+                            public void onFailure(String message) {
+                                Log.d("login", message);
+                            }
+                        });
                         listener.onSuccess();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -106,7 +125,11 @@ public class UserManager {
     }
 
     // Populate userMap
-    private void getUserDoc() {
+    public interface onGetUserDocListener {
+        void onSuccess();
+        void onFailure(String message);
+    }
+    private void getUserDoc(onGetUserDocListener listener) {
         DocumentReference docRef = db.collection("Users")
                 .document(getID());
         docRef.get().addOnCompleteListener(getUser -> {
@@ -115,11 +138,14 @@ public class UserManager {
                 if (document.exists()) {
                     userDoc.put("name", document.getData().get("name"));
                     userDoc.put("groupID", document.getData().get("groupID"));
+                    listener.onSuccess();
                 } else {
                     Log.d("getUser", "No such document");
+                    listener.onFailure("No such document");
                 }
             } else {
                 Log.d("getUser", "get failed with ", getUser.getException());
+                listener.onFailure(getUser.getException().getMessage());
             }
         });
     }
