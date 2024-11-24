@@ -111,19 +111,36 @@ public class UserManager {
         });
     }
 
-    // Joins a group by groupID
-    public void joinGroup(String groupJoinID) {
-        // Update user
-        Map<String, Object> userUpdate = new HashMap<>();
-        userUpdate.put("groupID", groupJoinID);
-        db.collection("Users").document(getID())
-                .set(userUpdate, SetOptions.merge());
-        // Update group
-        Map<String, Object> groupUpdate = new HashMap<>();
-        groupUpdate.put("name", getName());
-        db.collection("FamilyGroups")
-                .document(groupJoinID).collection("Members").document(getID())
-                .set(groupUpdate, SetOptions.merge());
+    // Joins a group by invite code string
+    public void joinGroup(String groupJoinCode) {
+        DocumentReference docRef = db.collection("Invites")
+                .document(groupJoinCode);
+        docRef.get().addOnCompleteListener(getGroup -> {
+            if (getGroup.isSuccessful()) {
+                DocumentSnapshot document = getGroup.getResult();
+                if (document.exists()) {
+                    String groupJoinID = document.getData().get("groupID").toString();
+
+                    // Update user
+                    Map<String, Object> userUpdate = new HashMap<>();
+                    userUpdate.put("groupID", groupJoinID);
+                    db.collection("Users").document(getID())
+                            .set(userUpdate, SetOptions.merge());
+                    // Update group
+                    Map<String, Object> groupUpdate = new HashMap<>();
+                    groupUpdate.put("name", getName());
+                    db.collection("FamilyGroups")
+                            .document(groupJoinID).collection("Members")
+                            .document(getID())
+                            .set(groupUpdate, SetOptions.merge());
+                } else {
+                    Log.d("joinGroup", "No such invite document");
+                }
+            } else {
+                Log.d("joinGroup", "get failed with ", getGroup.getException());
+            }
+        });
+
     }
 
     // Leaves group user is currently in
