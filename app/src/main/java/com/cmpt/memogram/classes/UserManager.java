@@ -10,6 +10,8 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class UserManager {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -109,19 +111,44 @@ public class UserManager {
         });
     }
 
-    // Joins a group by groupID
-    public void joinGroup(String groupJoinID) {
-        // Update user
-        Map<String, Object> userUpdate = new HashMap<>();
-        userUpdate.put("groupID", groupJoinID);
-        db.collection("Users").document(getID())
-                .set(userUpdate, SetOptions.merge());
-        // Update group
-        Map<String, Object> groupUpdate = new HashMap<>();
-        groupUpdate.put("name", getName());
-        db.collection("FamilyGroups")
-                .document(groupJoinID).collection("Members").document(getID())
-                .set(groupUpdate, SetOptions.merge());
+    // Joins a group by invite code string
+    public interface onJoinGroupListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void joinGroup(String groupJoinCode, onJoinGroupListener listener) {
+        DocumentReference docRef = db.collection("Invites")
+                .document(groupJoinCode);
+        docRef.get().addOnCompleteListener(getGroup -> {
+            if (getGroup.isSuccessful()) {
+                DocumentSnapshot document = getGroup.getResult();
+                if (document.exists()) {
+                    String groupJoinID = document.getData().get("groupID").toString();
+
+                    // Update user
+                    Map<String, Object> userUpdate = new HashMap<>();
+                    userUpdate.put("groupID", groupJoinID);
+                    db.collection("Users").document(getID())
+                            .set(userUpdate, SetOptions.merge());
+                    // Update group
+                    Map<String, Object> groupUpdate = new HashMap<>();
+                    groupUpdate.put("name", getName());
+                    db.collection("FamilyGroups")
+                            .document(groupJoinID).collection("Members")
+                            .document(getID())
+                            .set(groupUpdate, SetOptions.merge());
+                    db.collection("Invites").document(groupJoinCode).delete();
+                    listener.onSuccess();
+                } else {
+                    Log.d("joinGroup", "No such invite document");
+                    listener.onFailure();
+                }
+            } else {
+                Log.d("joinGroup", "Get failed with ", getGroup.getException());
+                listener.onFailure();
+            }
+        });
+
     }
 
     // Leaves group user is currently in
@@ -152,22 +179,72 @@ public class UserManager {
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
                             .set(admin, SetOptions.merge());
-                    joinGroup(createdGroupID);
+                    joinGroup(createdGroupID, new onJoinGroupListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d("createGroup", "Created and joined");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Log.d("createGroup", "Failed");
+                        }
+                    });
                 })
                 .addOnFailureListener(fail -> Log
                         .w("Create Group", "Error adding document"));
     }
 
+    // Creates invite code
+    public interface onGetInviteCodeListener {
+        void onSuccess(String groupCode);
+        void onFailure();
+    }
+    public void getInviteCode(final onGetInviteCodeListener listener) {
+        if (getGroupID() == null || Objects.equals(getGroupID(), "")) {
+            Log.d("getInviteCode", "groupID null or blank");
+            listener.onFailure();
+        }
+
+        AtomicReference<String> groupCode = new AtomicReference<>(randomCode());
+        DocumentReference docRef = db.collection("Invites")
+                .document(randomCode());
+        docRef.get().addOnCompleteListener(checkCode -> {
+            if (checkCode.isSuccessful()) {
+                DocumentSnapshot document = checkCode.getResult();
+                if (document.exists()) {
+                    getInviteCode(listener);
+                } else {
+                    Map<String, String> newInvite= new HashMap<>();
+                    newInvite.put("groupID", getGroupID());
+                    db.collection("Invites").document(groupCode.get())
+                            .set(newInvite, SetOptions.merge());
+                    listener.onSuccess(groupCode.get());
+                }
+            } else {
+                Log.d("getInviteCode", "get failed with ", checkCode.getException());
+                listener.onFailure();
+            }
+        });
+    }
+
+
+    //generates random string for invite code
+    //helper function for getInviteCode
+    String randomCode() {
+        StringBuilder code = new StringBuilder();
+        String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            int codeLength = 4;
+
+        for (int i = 0; i < codeLength; i++) {
+            code.append(alpha.charAt((int) Math.floor(Math.random() * 26)));
+        }
+        Log.d("randomCode", code.toString());
+        return code.toString();
+    }
     // TODO: Output members of group
     // public String[] getGroupMembers() {
     //   return null;
     // }
-    // Outputs group id for invite function,
-    // TODO: add functionality for one time join code?
-    public String getGroupCode() {
-        return getGroupID();
-    }
 
-    // TODO: Add invite functionality.
-    //
 }
