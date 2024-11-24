@@ -218,7 +218,11 @@ public class UserManager {
     }
 
     // Creates a group
-    public void createGroup(String name) {
+    public interface onCreateGroupListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void createGroup(String name, onCreateGroupListener listener) {
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
@@ -235,16 +239,20 @@ public class UserManager {
                         @Override
                         public void onSuccess() {
                             Log.d("createGroup", "Created and joined");
+                            listener.onSuccess();
                         }
 
                         @Override
                         public void onFailure() {
                             Log.d("createGroup", "Failed");
+                            listener.onFailure();
                         }
                     });
                 })
-                .addOnFailureListener(fail -> Log
-                        .w("Create Group", "Error adding document"));
+                .addOnFailureListener(fail -> {
+                    Log.w("Create Group", "Error adding document");
+                    listener.onFailure();
+                });
     }
 
     // Creates invite code
