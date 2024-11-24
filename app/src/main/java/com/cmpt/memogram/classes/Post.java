@@ -8,4 +8,8 @@ public class Post {
     public String imagePath;
     public String imageDownloadLink;
     public String datePosted;
+    public String dateListed;
+    public String posterID;
+    public String tag;
+    public boolean includeAudio;
 }
