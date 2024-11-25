@@ -18,4 +18,13 @@
     <string name="add_tags">Add tags</string>
     <string name="audio">Audio</string>
     <string name="play_back">Play Back</string>
+
+    <string-array name="Roles">
+        <item>Son</item>
+        <item>Daughter</item>
+        <item>Grandson</item>
+        <item>Granddaughter</item>
+        <item>Nephew</item>
+        <item>Niece</item>
+    </string-array>
 </resources>
