@@ -31,15 +31,17 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
     private final List<Post> mPosts;
     private boolean isTutorialExpanded = false;
+    private boolean showTutorial;
 
-    public PostAdapter(Context context, List<Post> posts) {
+    public PostAdapter(Context context, List<Post> posts, boolean showTutorial) {
         mContext = context;
         mPosts = posts;
+        this.showTutorial = showTutorial;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if (showTutorial && position == 0) {
             return VIEW_TYPE_TUTORIAL;
         } else {
             return VIEW_TYPE_POST;
@@ -63,14 +65,14 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder.getItemViewType() == VIEW_TYPE_TUTORIAL) {
             ((TutorialViewHolder) holder).bind();
         } else {
-            Post post = mPosts.get(position - 1);
+            Post post = mPosts.get(showTutorial ? position - 1 : position);
             ((PostViewHolder) holder).bind(post);
         }
     }
 
     @Override
     public int getItemCount() {
-        return mPosts.size() + 1;
+        return showTutorial ? mPosts.size() + 1 : mPosts.size();
     }
 
     class TutorialViewHolder extends RecyclerView.ViewHolder {
@@ -120,7 +122,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void bind(Post post) {
             description.setText(post.text);
             title.setText(post.title);
-            postDate.setText(getRelativeTime(post.datePosted));
+            postDate.setText(getRelativeTime(post.dateListed)); // Use dateListed instead of datePosted
 
             String imageUrl = post.imageDownloadLink;
             String audioUrl = post.audioDownloadLink;

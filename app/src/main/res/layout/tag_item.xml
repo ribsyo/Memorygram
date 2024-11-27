@@ -6,23 +6,23 @@
     android:gravity="center"
     android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/tag_image"
+    <ImageButton
+        android:id="@+id/tag_btn"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/ic_folder"
-        android:scaleType="centerCrop"
-        android:clickable="true"
-        android:focusable="true"
-        app:tint="@color/blue" />
+        app:tint="@color/blue"
+        android:scaleType="fitCenter"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 
     <TextView
-        android:id="@+id/hash_tag"
+        android:id="@+id/tag_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tag"
+        android:text="Tag Name"
         android:fontFamily="@font/ptsans"
-        android:textColor="@color/white"
         android:textSize="16sp"
-        android:layout_marginTop="2dp"/>
+        android:textColor="@color/white"
+        android:gravity="center" />
+
 </LinearLayout>

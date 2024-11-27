@@ -1,35 +1,50 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/dark_green"
     android:layout_marginTop="65dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="75dp">
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@color/yellow"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
 
         <TextView
+            android:id="@+id/view_collection_tutorial_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:text="This is where you can view collections! Press here to learn more."
+            android:textSize="14sp"
+            android:textColor="@color/black"
             android:fontFamily="@font/nunito"
-            android:gravity="center"
-            android:text="VIEW COLLECTION"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:drawableRight="@drawable/ic_drop_down"
+            android:drawableTint="@color/black"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/view_collection_tutorial_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_collection_tutorial_title"
+            android:layout_marginTop="8dp"
+            android:text="Firstly, select a collection to view. Then, you can sort the collection by user or tag. Press the buttons below to sort the collection."
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/ptsans"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
 
         <Button
             android:id="@+id/sort_by_user_btn"
@@ -39,9 +54,7 @@
             android:layout_marginEnd="10dp"
             android:text="SORT BY USER"
             android:backgroundTint="@color/blue"
-            android:drawableLeft="@drawable/ic_role">
-
-        </Button>
+            android:drawableLeft="@drawable/ic_role"/>
 
         <Button
             android:id="@+id/sort_by_tag_btn"
@@ -51,25 +64,15 @@
             android:layout_marginEnd="20dp"
             android:text="SORT BY TAG"
             android:backgroundTint="@color/blue"
-            android:drawableLeft="@drawable/ic_hashtag">
-
-        </Button>
+            android:drawableLeft="@drawable/ic_hashtag"/>
 
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/collection_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="145dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="20dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/collection_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-    </LinearLayout>
-
-
-</RelativeLayout>
+</LinearLayout>

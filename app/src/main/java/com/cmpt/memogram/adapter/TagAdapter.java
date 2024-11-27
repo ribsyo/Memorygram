@@ -1,51 +1,47 @@
 package com.cmpt.memogram.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.ui.fragment.CollectionFragment;
 import java.util.List;
-import android.widget.ImageView;
 
-public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
+public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
 
-    private Context context;
-    private List<String> tagList;
+    private List<String> tags;
+    private CollectionFragment fragment;
 
-    public TagAdapter(Context context, List<String> tagList) {
-        this.context = context;
-        this.tagList = tagList;
+    public TagAdapter(List<String> tags, CollectionFragment fragment) {
+        this.tags = tags;
+        this.fragment = fragment;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tag_item, parent, false);
-        return new ViewHolder(view);
+    public TagViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.tag_item, parent, false);
+        return new TagViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        String tag = tagList.get(position);
-        holder.hashTag.setText(tag);
-        holder.tagImage.setImageResource(R.drawable.ic_folder); // Ensure the image is always the same
-    }
+    public void onBindViewHolder(TagViewHolder holder, int position) {
+        String tag = tags.get(position);
+        holder.tagName.setText(tag);
+        holder.itemView.setOnClickListener(v -> fragment.openCollectionHomeFragment("tag", tag));    }
 
     @Override
     public int getItemCount() {
-        return tagList.size();
+        return tags.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView hashTag;
-        public ImageView tagImage;
+    public static class TagViewHolder extends RecyclerView.ViewHolder {
+        TextView tagName;
 
-        public ViewHolder(View itemView) {
+        public TagViewHolder(View itemView) {
             super(itemView);
-            hashTag = itemView.findViewById(R.id.hash_tag);
-            tagImage = itemView.findViewById(R.id.tag_image);
+            tagName = itemView.findViewById(R.id.tag_name);
         }
     }
 }
