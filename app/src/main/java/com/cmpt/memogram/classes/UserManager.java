@@ -114,6 +114,7 @@ public class UserManager {
                         newUser.put("groupID", "");
                         newUser.put("role", "");
                         newUser.put("name", name);
+                        newUser.put("imagePath", "");
 
                         db.collection("Users").document(getID())
                                 .set(newUser, SetOptions.merge());
@@ -141,6 +142,7 @@ public class UserManager {
                     userDoc.put("name", document.getData().get("name"));
                     userDoc.put("groupID", document.getData().get("groupID"));
                     userDoc.put("role", document.getData().get("role"));
+                    userDoc.put("imagePath", document.getData().get("imagePath"));
                     listener.onSuccess();
                 } else {
                     Log.d("getUser", "No such document");
@@ -176,6 +178,8 @@ public class UserManager {
                     // Update group
                     Map<String, Object> groupUpdate = new HashMap<>();
                     groupUpdate.put("name", getName());
+                    groupUpdate.put("role", role);
+                    groupUpdate.put("imagePath", userDoc.get("imagePath")).toString();
                     db.collection("FamilyGroups")
                             .document(groupJoinID).collection("Members")
                             .document(getID())
