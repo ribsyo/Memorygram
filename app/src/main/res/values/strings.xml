@@ -3,19 +3,24 @@
     <string name="logo">Logo</string>
     <string name="view_collection">View Collection</string>
     <string name="post">Post</string>
-
-    <!-- Strings used for settings_layout.xml  -->
-    <string name="settings">SETTINGS</string>
-    <string name="greater_than">></string>"
-    <string name="generate_one_time_code">GENERATE ONE-TIME CODE</string>
-    <string name="manage_family">MANAGE FAMILY</string>
-    <string name="leave_family">LEAVE FAMILY GROUP</string>
-
-    <!-- Strings used for post_layout.xml  -->
-    <string name="create_post">CREATE POST</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_post">Create Post</string>
     <string name="upload_image">Upload an image</string>
+    <string name="write_title">Write Title</string>
     <string name="write_caption">Write a caption...</string>
     <string name="add_tags">Add tags</string>
-    <string name="audio">Audio</string>
-    <string name="play_back">Play Back</string>
+    <string name="record_audio">Record Audio</string>
+    <string name="audio_playback">Audio Playback</string>
+    <string name="settings">Settings</string>
+    <string name="generate_one_time_code">Generate One-Time Code</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="manage_family">Manage Family</string>
+    <string name="leave_family">Leave Family Group</string>
+    <string name="title">Title</string>
+    <string name="posted_date">Posted Date</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="description">Description</string>
 </resources>

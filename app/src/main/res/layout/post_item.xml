@@ -31,7 +31,7 @@
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="25dp"
                     android:fontFamily="@font/nunito"
-                    android:text="TITLE"
+                    android:text="@string/title"
                     android:textColor="@color/black"
                     android:textSize="24sp">
                 </TextView>
@@ -55,7 +55,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginBottom="15dp"
                 android:fontFamily="@font/ptsans"
-                android:text="POSTED DATE"
+                android:text="@string/posted_date"
                 android:textColor="@color/sage"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -136,7 +136,7 @@
                     android:fontFamily="@font/ptsans"
                     android:gravity="center"
                     android:paddingHorizontal="20dp"
-                    android:text="Play Audio"
+                    android:text="@string/play_audio"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -147,7 +147,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginBottom="40dp"
                 android:fontFamily="@font/ptsans"
-                android:text="DESCRIPTION"
+                android:text="@string/description"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
