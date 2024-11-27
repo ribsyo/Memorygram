@@ -32,6 +32,17 @@ public class UserManager {
             this.getUserDoc(new onGetUserDocListener() {
                 @Override
                 public void onSuccess() {
+                    getGroupMembers(new onGetGroupMembersListener() {
+                        @Override
+                        public void onSuccess(List<User> users) {
+
+                        }
+
+                        @Override
+                        public void onFailure() {
+
+                        }
+                    });
                 }
 
                 @Override
@@ -317,7 +328,7 @@ public class UserManager {
     }
     public void getGroupMembers(onGetGroupMembersListener listener) {
         CollectionReference membersCollection = db.collection("FamilyGroups")
-                .document("alexGroup")
+                .document(getGroupID())
                 .collection("Members");
 
         membersCollection.get().addOnCompleteListener(getMembers -> {
@@ -326,28 +337,30 @@ public class UserManager {
                 for (QueryDocumentSnapshot document : getMembers.getResult()) {
                     User member = new User();
                     member.ID = document.getId();
-                    member.name = "Fred";
-                    if (document.getData().get("name") != null) {
-                        member.name = document.getData().get("name").toString();
-                    }
-
-                    member.imagePath = "";
-                    member.imageDownloadLink = "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
-                    /*getMedia(member.imagePath, new OnGetFileListener() {
+                    member.name = document.getData().get("name") != null ?
+                            document.getData().get("name").toString() : "NAME BLANK";
+                    member.imagePath = "alexGroup/6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg";
+                    getMedia(member.imagePath, new OnGetFileListener() {
                         @Override
                         public void onSuccess(String downloadLink) {
                             System.out.println("got image file");
-                            member.imageDownloadLink = "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
+                            member.imageDownloadLink = downloadLink;
+                            member.role = document.getData().get("role") != null ?
+                                    document.getData().get("role").toString() : "";
+                            members.add(member);
                         }
                         @Override
                         public void onFailure() {
                             // Handle the failure
                             member.imageDownloadLink = "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
+                            member.role = document.getData().get("role") != null ?
+                                    document.getData().get("role").toString() : "";
+                            members.add(member);
                         }
-                    })
-                     */
-                    member.role = "";
-                    Log.d("getGroupMembers", member.imageDownloadLink + " " + member.name);
+                    });
+                    member.role = document.getData().get("role") != null ?
+                            document.getData().get("role").toString() : "";
+                    Log.d("getGroupMembers", member.imagePath + " " + member.imageDownloadLink + " " + member.name + " " + member.role);
                     members.add(member);
                 }
                 listener.onSuccess(members);
