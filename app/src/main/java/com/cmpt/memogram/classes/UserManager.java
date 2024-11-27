@@ -11,6 +11,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UserManager {
@@ -111,6 +112,7 @@ public class UserManager {
                         Log.d("register", "createUserWithEmail:success");
                         Map<String, String> newUser = new HashMap<>();
                         newUser.put("groupID", "");
+                        newUser.put("role", "");
                         newUser.put("name", name);
 
                         db.collection("Users").document(getID())
@@ -138,6 +140,7 @@ public class UserManager {
                 if (document.exists()) {
                     userDoc.put("name", document.getData().get("name"));
                     userDoc.put("groupID", document.getData().get("groupID"));
+                    userDoc.put("role", document.getData().get("role"));
                     listener.onSuccess();
                 } else {
                     Log.d("getUser", "No such document");
@@ -155,9 +158,9 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void joinGroup(String groupJoinCode, onJoinGroupListener listener) {
+    public void joinGroup(String groupJoinCode, String role, onJoinGroupListener listener) {
         DocumentReference docRef = db.collection("Invites")
-                .document(groupJoinCode);
+                .document(groupJoinCode.toUpperCase());
         docRef.get().addOnCompleteListener(getGroup -> {
             if (getGroup.isSuccessful()) {
                 DocumentSnapshot document = getGroup.getResult();
@@ -167,6 +170,7 @@ public class UserManager {
                     // Update user
                     Map<String, Object> userUpdate = new HashMap<>();
                     userUpdate.put("groupID", groupJoinID);
+                    userUpdate.put("role", role);
                     db.collection("Users").document(getID())
                             .set(userUpdate, SetOptions.merge());
                     // Update group
@@ -176,7 +180,7 @@ public class UserManager {
                             .document(groupJoinID).collection("Members")
                             .document(getID())
                             .set(groupUpdate, SetOptions.merge());
-                    db.collection("Invites").document(groupJoinCode).delete();
+                    db.collection("Invites").document(groupJoinCode.toUpperCase()).delete();
                     listener.onSuccess();
                 } else {
                     Log.d("joinGroup", "No such invite document");
@@ -208,6 +212,7 @@ public class UserManager {
         // Update user
         Map<String, Object> userUpdate = new HashMap<>();
         userUpdate.put("groupID", "");
+        userUpdate.put("role", "");
         db.collection("Users").document(getID())
                 .set(userUpdate, SetOptions.merge()).addOnCompleteListener(delete -> {
                     if(!delete.isSuccessful()) {
@@ -222,7 +227,7 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void createGroup(String name, onCreateGroupListener listener) {
+    public void createGroup(String name, String role, onCreateGroupListener listener) {
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
@@ -235,7 +240,7 @@ public class UserManager {
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
                             .set(admin, SetOptions.merge());
-                    joinGroup(createdGroupID, new onJoinGroupListener() {
+                    joinGroup(createdGroupID, role, new onJoinGroupListener() {
                         @Override
                         public void onSuccess() {
                             Log.d("createGroup", "Created and joined");
@@ -253,6 +258,35 @@ public class UserManager {
                     Log.w("Create Group", "Error adding document");
                     listener.onFailure();
                 });
+    }
+
+    // Updates group role
+    public interface onUpdateRoleListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void updateRole(String role, onUpdateRoleListener listener) {
+        // Update group
+        Map<String, Object> groupUpdate = new HashMap<>();
+        groupUpdate.put("role", role);
+        db.collection("FamilyGroups")
+                .document(getGroupID()).collection("Members").document(getID())
+                .set(groupUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                    if(!update.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                });
+
+        // Update user
+        Map<String, Object> userUpdate = new HashMap<>();
+        userUpdate.put("role", role);
+        db.collection("Users").document(getID())
+                .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                    if(!update.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                });
+        listener.onSuccess();
     }
 
     // Creates invite code
