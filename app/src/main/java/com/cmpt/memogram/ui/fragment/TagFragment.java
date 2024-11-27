@@ -17,7 +17,7 @@ public class TagFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_collection_home, container, false);
 
-        TextView tagNameTextView = view.findViewById(R.id.tag_name);
+        TextView tagNameTextView = view.findViewById(R.id.collection_home_title);
         if (getArguments() != null) {
             String tagName = getArguments().getString("tag_name");
             tagNameTextView.setText(tagName);
