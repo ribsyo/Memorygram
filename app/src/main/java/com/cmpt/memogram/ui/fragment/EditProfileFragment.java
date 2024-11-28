@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.UserManager;
@@ -71,8 +72,19 @@ public class EditProfileFragment extends Fragment {
                 nameEdit.setText(um.getName());
                 emailEdit.setText(um.getEmail());
                 roleEdit.setText(um.getRole());
-            }
+                um.getProfilePicture(new UserManager.onGetProfilePictureListener() {
+                    @Override
+                    public void onSuccess(String downloadLink) {
+                        Glide.with(view)
+                                .load(downloadLink)
+                                .into(imagePreview);
+                    }
+                    @Override
+                    public void onFailure() {
 
+                    }
+                });
+            }
             @Override
             public void onFailure(String message) {
 
