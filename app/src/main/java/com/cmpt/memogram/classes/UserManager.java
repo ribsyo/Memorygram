@@ -35,14 +35,7 @@ public class UserManager {
             this.getUserDoc(new onGetUserDocListener() {
                 @Override
                 public void onSuccess() {
-                    createGroup("test", new onCreateGroupListener() {
-                        @Override
-                        public void onSuccess() {
-                        }
-                        @Override
-                        public void onFailure() {
-                        }
-                    });
+
                 }
                 @Override
                 public void onFailure(String message) {
