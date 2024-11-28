@@ -89,10 +89,9 @@ public class UserManager {
         return null;
     }
 
-    //TODO
     public String getEmail() {
-        if (userDoc.get("role") != null) {
-            return"test45@test.ca";
+        if (mAuth.getCurrentUser() != null) {
+            return mAuth.getCurrentUser().getEmail();
         }
         return null;
     }
