@@ -19,6 +19,16 @@
     <string name="audio_playback">AUDIO PLAYBACK</string>
     <string name="no_tag">none</string>
 
+    <string name="edit_profile">Edit Profile</string>
+    <string name="manage_family">Manage Family</string>
+    <string name="leave_family">Leave Family Group</string>
+    <string name="title">Title</string>
+    <string name="posted_date">Posted Date</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="description">Description</string>
+
+    <string name="settings">Settings</string>
+    <string name="generate_one_time_code">Generate One-Time Code</string>
 
     <string name="toast_image_required">Please select an image first</string>
     <string name="toast_creating_post">Creating post…</string>
@@ -31,4 +41,13 @@
 
     <string name="post_upload_success">Post uploaded successfully.</string>
     <string name="post_upload_fail">Failed to upload post.</string>
+
+    <string-array name="Roles">
+        <item>Son</item>
+        <item>Daughter</item>
+        <item>Grandson</item>
+        <item>Granddaughter</item>
+        <item>Nephew</item>
+        <item>Niece</item>
+    </string-array>
 </resources>
