@@ -125,7 +125,7 @@ public class UserManager {
             });
 
         }
-        return "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
+        return "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/profilePictures%2FUntitled.jpg?alt=media&token=e97c16d5-86bd-4a86-8498-89148ad8ee0b";
     }
 
     // Logs in with provided credentials returns true on success
@@ -179,7 +179,7 @@ public class UserManager {
                         newUser.put("groupID", "");
                         newUser.put("role", "");
                         newUser.put("name", name);
-                        newUser.put("imagePath", "");
+                        newUser.put("imagePath", "profilePictures/Untitled.jpg");
 
                         db.collection("Users").document(getID())
                                 .set(newUser, SetOptions.merge());
