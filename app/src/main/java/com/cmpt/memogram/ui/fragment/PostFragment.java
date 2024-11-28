@@ -57,6 +57,7 @@ public class PostFragment extends Fragment {
     private MediaPlayer mediaPlayer;
     private String audioFilePath;
     private boolean isRecording = false;
+    private boolean hasAudioRecording = false;
 
     private Button datePickerButton;
     private Date selectedDate;
@@ -139,14 +140,17 @@ public class PostFragment extends Fragment {
                     String finalTags = tags.isEmpty() ? "none" : tags;
 
                     prepareImageBytes();
-                    prepareAudioBytes();
+                    if (hasAudioRecording) {
+                        prepareAudioBytes();
+                    }
 
-                    PostData postData = new PostData(
-                            imageBytes,
-                            caption,
-                            finalTags,
-                            audioBytes
-                    );
+
+//                    PostData postData = new PostData(
+//                            imageBytes,
+//                            caption,
+//                            finalTags,
+//                            audioBytes
+//                    );
 
                     //String title = getFileName(selectedImageUri);
                     //byte[] audioData = new byte[1];
@@ -278,6 +282,7 @@ public class PostFragment extends Fragment {
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         mediaRecorder.setOutputFile(audioFilePath);
+        hasAudioRecording = false;
 
         try {
             mediaRecorder.prepare();
@@ -305,7 +310,13 @@ public class PostFragment extends Fragment {
                 Toast.makeText(getContext(), "Error stopping recording", Toast.LENGTH_SHORT).show();
             }
         }
+        hasAudioRecording = true;
     }
+
+    private void setHasAudioRecording(boolean hasAudio) {
+        this.hasAudioRecording = hasAudio;
+    }
+
 
     private void playAudio() {
         mediaPlayer = new MediaPlayer();
