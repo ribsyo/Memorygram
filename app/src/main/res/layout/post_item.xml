@@ -31,7 +31,6 @@
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="25dp"
                     android:fontFamily="@font/nunito"
-                    android:text="@string/title"
                     android:textColor="@color/black"
                     android:textSize="24sp">
                 </TextView>
@@ -56,7 +55,6 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginBottom="15dp"
                 android:fontFamily="@font/ptsans"
-                android:text="@string/posted_date"
                 android:textColor="@color/sage"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -90,8 +88,7 @@
                     android:layout_width="45dp"
                     android:layout_height="45dp"
                     android:layout_gravity="center"
-                    android:layout_marginEnd="10dp"
-                    android:src="@mipmap/cat" />
+                    android:layout_marginEnd="10dp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -108,10 +105,10 @@
                         android:fontFamily="@font/nunito"
                         android:gravity="start"
                         android:letterSpacing="0.1"
-                        android:text="JAMES"
                         android:textAlignment="textStart"
                         android:textColor="@color/black"
-                        android:textSize="14sp" />
+                        android:textSize="12sp"
+                        android:textAllCaps="true"/>
 
                     <TextView
                         android:id="@+id/role"
@@ -120,11 +117,11 @@
                         android:fontFamily="@font/ptsans"
                         android:gravity="start"
                         android:letterSpacing="0.1"
-                        android:text="GRANDSON"
                         android:textAlignment="textStart"
                         android:textColor="@color/sage"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"/>
                 </LinearLayout>
 
                 <Button
@@ -148,7 +145,6 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginBottom="40dp"
                 android:fontFamily="@font/ptsans"
-                android:text="@string/description"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 

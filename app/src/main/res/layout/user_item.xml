@@ -18,10 +18,25 @@
         android:id="@+id/user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User Name"
-        android:fontFamily="@font/ptsans"
-        android:textSize="16sp"
+        android:textAllCaps="true"
+        android:fontFamily="@font/nunito"
+        android:letterSpacing="0.1"
+        android:textStyle="bold"
+        android:textSize="12sp"
         android:textColor="@color/white"
         android:layout_marginTop="8dp"
         android:gravity="center" />
+
+    <TextView
+        android:id="@+id/role"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:fontFamily="@font/ptsans"
+        android:letterSpacing="0.1"
+        android:textSize="12sp"
+        android:textColor="@color/sage"
+        android:layout_marginTop="2dp"
+        android:gravity="center" />
+
 </LinearLayout>

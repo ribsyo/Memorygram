@@ -30,6 +30,25 @@ public class CollectionHomeFragment extends Fragment {
     private PostManager postManager;
     private static final String TAG = "CollectionHomeFragment";
 
+    private static final String ARG_USER_NAME = "userName";
+    private String userName;
+
+    public static CollectionHomeFragment newInstance(String userName) {
+        CollectionHomeFragment fragment = new CollectionHomeFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_USER_NAME, userName);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            userName = getArguments().getString(ARG_USER_NAME);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_collection_home, container, false);
@@ -58,6 +77,8 @@ public class CollectionHomeFragment extends Fragment {
 
             if ("tag".equals(filterType)) {
                 filterPostsByTag(filterValue);
+            } else if ("user".equals(filterType)) {
+                filterPostsByUserName(filterValue);
             }
         }
 
@@ -70,6 +91,8 @@ public class CollectionHomeFragment extends Fragment {
         String filterValue = getArguments().getString("filterValue");
         if ("tag".equals(filterType)) {
             filterPostsByTag(filterValue);
+        } else if ("user".equals(filterType)) {
+            filterPostsByUserName(filterValue);
         }
     }
 
@@ -83,36 +106,7 @@ public class CollectionHomeFragment extends Fragment {
                     swipeRefreshLayout.setRefreshing(false);
                     return;
                 }
-                final int totalPosts = postNames.size();
-                final int[] fetchedPosts = {0};
-                List<Post> tempPostList = new ArrayList<>(totalPosts);
-
-                for (int i = 0; i < totalPosts; i++) {
-                    tempPostList.add(null);
-                }
-
-                for (int i = 0; i < totalPosts; i++) {
-                    final int index = i;
-                    String postName = postNames.get(i);
-                    postManager.getPost(postName, new OnGetPostListener() {
-                        @Override
-                        public void onSuccess(Post post) {
-                            tempPostList.set(index, post);
-                            fetchedPosts[0]++;
-                            if (fetchedPosts[0] == totalPosts) {
-                                sortAndDisplayPosts(tempPostList);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            fetchedPosts[0]++;
-                            if (fetchedPosts[0] == totalPosts) {
-                                swipeRefreshLayout.setRefreshing(false);
-                            }
-                        }
-                    });
-                }
+                fetchPosts(postNames);
             }
 
             @Override
@@ -121,6 +115,60 @@ public class CollectionHomeFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    private void filterPostsByUserName(String userName) {
+        postLists.clear();
+        postManager.getAllPostNamesByPoster(userName, new OnGetPostNamesListener() {
+            @Override
+            public void onSuccess(List<String> postNames) {
+                if (postNames.isEmpty()) {
+                    Log.d(TAG, "No posts found for user: " + userName);
+                    swipeRefreshLayout.setRefreshing(false);
+                    return;
+                }
+                fetchPosts(postNames);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e(TAG, "Failed to fetch post names for user: " + userName);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void fetchPosts(List<String> postNames) {
+        final int totalPosts = postNames.size();
+        final int[] fetchedPosts = {0};
+        List<Post> tempPostList = new ArrayList<>(totalPosts);
+
+        for (int i = 0; i < totalPosts; i++) {
+            tempPostList.add(null);
+        }
+
+        for (int i = 0; i < totalPosts; i++) {
+            final int index = i;
+            String postName = postNames.get(i);
+            postManager.getPost(postName, new OnGetPostListener() {
+                @Override
+                public void onSuccess(Post post) {
+                    tempPostList.set(index, post);
+                    fetchedPosts[0]++;
+                    if (fetchedPosts[0] == totalPosts) {
+                        sortAndDisplayPosts(tempPostList);
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    fetchedPosts[0]++;
+                    if (fetchedPosts[0] == totalPosts) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+            });
+        }
     }
 
     private void sortAndDisplayPosts(List<Post> posts) {

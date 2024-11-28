@@ -3,6 +3,7 @@ package com.cmpt.memogram.adapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,15 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.Post;
+import com.cmpt.memogram.classes.User;
+import com.cmpt.memogram.classes.UserManager;
+import com.cmpt.memogram.ui.fragment.CollectionHomeFragment;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -32,11 +37,13 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<Post> mPosts;
     private boolean isTutorialExpanded = false;
     private boolean showTutorial;
+    private UserManager userManager;
 
     public PostAdapter(Context context, List<Post> posts, boolean showTutorial) {
         mContext = context;
         mPosts = posts;
         this.showTutorial = showTutorial;
+        this.userManager = new UserManager();
     }
 
     @Override
@@ -108,6 +115,9 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView postDate;
         public Button playAudio;
         public ImageView editPostBtn;
+        public TextView nameTextView;
+        public TextView roleTextView;
+        public ImageView profileImageView;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -117,6 +127,9 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             postDate = itemView.findViewById(R.id.post_date);
             playAudio = itemView.findViewById(R.id.play_audio);
             editPostBtn = itemView.findViewById(R.id.edit_post_btn);
+            nameTextView = itemView.findViewById(R.id.poster);
+            roleTextView = itemView.findViewById(R.id.role);
+            profileImageView = itemView.findViewById(R.id.profile_image);
         }
 
         public void bind(Post post) {
@@ -144,6 +157,43 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 popupMenu.inflate(R.menu.popup_menu);
                 popupMenu.show();
             });
+
+            // Fetch group members and bind user details
+            userManager.getGroupMembers(new UserManager.onGetGroupMembersListener() {
+                @Override
+                public void onSuccess(List<User> users) {
+                    for (User user : users) {
+                        if (user.ID.equals(post.posterID)) {
+                            System.out.println("PosterID: " + post.posterID);
+                            System.out.println("User Name: " + user.name);
+                            nameTextView.setText(user.name);
+                            roleTextView.setText(user.role);
+                            Glide.with(mContext).load(user.imageDownloadLink).into(profileImageView);
+
+                            // Set OnClickListener to open CollectionHomeFragment
+                            View.OnClickListener userClickListener = v -> openCollectionHomeFragment(user.name);
+                            nameTextView.setOnClickListener(userClickListener);
+                            profileImageView.setOnClickListener(userClickListener);
+
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.e("PostAdapter", "Failed to fetch group members");
+                }
+            });
+        }
+
+        private void openCollectionHomeFragment(String userName) {
+            CollectionHomeFragment fragment = CollectionHomeFragment.newInstance(userName);
+            ((FragmentActivity) mContext).getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 
@@ -198,7 +248,9 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 return "a minute ago";
             } else if (minutes > 1 && minutes < 60) {
                 return minutes + " minutes ago";
-            } else if (hours < 24) {
+            } else if (hours == 1) {
+                return "an hour ago";
+            } else if (hours > 1 && hours < 24) {
                 return hours + " hours ago";
             } else {
                 SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
