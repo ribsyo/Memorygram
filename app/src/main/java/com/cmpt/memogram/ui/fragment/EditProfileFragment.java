@@ -1,11 +1,7 @@
 package com.cmpt.memogram.ui.fragment;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,40 +12,33 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.cmpt.memogram.R;
-import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.UserManager;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int PERMISSION_REQUEST_CODE = 200;
     private CircleImageView imagePreview;
     private TextView imageButton;
     private EditText nameEdit;
     private EditText emailEdit;
-    private AutoCompleteTextView roleEdit;
+    private EditText pwEdit;
+    private AutoCompleteTextView roleDropdown;
     private Button saveButton;
     private Uri selectedImageUri;
     private byte[] imageBytes;
@@ -63,7 +52,8 @@ public class EditProfileFragment extends Fragment {
         imageButton = view.findViewById(R.id.change_profile_picture_btn);
         nameEdit = view.findViewById(R.id.username);
         emailEdit = view.findViewById(R.id.email);
-        roleEdit = view.findViewById(R.id.role);
+        pwEdit = view.findViewById(R.id.password);
+        AutoCompleteTextView roleDropdown = view.findViewById(R.id.role);
         saveButton = view.findViewById(R.id.save_btn);
         UserManager um = new UserManager();
         um.getUserDoc(new UserManager.onGetUserDocListener() {
@@ -71,7 +61,7 @@ public class EditProfileFragment extends Fragment {
             public void onSuccess() {
                 nameEdit.setText(um.getName());
                 emailEdit.setText(um.getEmail());
-                roleEdit.setText(um.getRole());
+                roleDropdown.setText(um.getRole(), false);
                 um.getProfilePicture(new UserManager.onGetProfilePictureListener() {
                     @Override
                     public void onSuccess(String downloadLink) {
@@ -90,9 +80,6 @@ public class EditProfileFragment extends Fragment {
 
             }
         });
-        nameEdit.setText(um.getName());
-        emailEdit.setText(um.getEmail());
-        roleEdit.setText(um.getRole());
 
         //back button
         ImageView backButton = view.findViewById(R.id.back_btn);
@@ -104,7 +91,6 @@ public class EditProfileFragment extends Fragment {
         });
 
         //role dropdown
-        AutoCompleteTextView roleDropdown = view.findViewById(R.id.role);
         String[] roles = getResources().getStringArray(R.array.Roles);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, R.id.textView, roles);
         roleDropdown.setAdapter(adapter);
@@ -123,26 +109,32 @@ public class EditProfileFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                    if(pwEdit.getText().toString().isEmpty()) {
+                        Toast.makeText(getContext(), "Enter a password please", Toast.LENGTH_SHORT).show();
+                        return;
+                    };
                     saveButton.setEnabled(false);
 
                     String name = nameEdit.getText().toString();
-                    String email = emailEdit.getText().toString().trim();
-                    String role = roleEdit.getText().toString();
+                    String email = emailEdit.getText().toString();
+                    String role = roleDropdown.getText().toString();
+                    String pw = pwEdit.getText().toString();
                     prepareImageBytes();
 
 
                     Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
-
+                    String imPath = um.getImagePath();
                     //TODO upload image logic
 
-                    um.update(name, email, role, "", new UserManager.onUpdateListener() {
+                    um.update(name, email, role, pw, imPath, new UserManager.onUpdateListener() {
                         @Override
                         public void onSuccess() {
                             Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
+                            getParentFragmentManager().popBackStack();
                         }
                         @Override
                         public void onFailure() {
+                            saveButton.setEnabled(true);
                             Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
                         }
                     });

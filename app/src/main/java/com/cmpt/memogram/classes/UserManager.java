@@ -2,6 +2,8 @@ package com.cmpt.memogram.classes;
 
 import android.util.Log;
 
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -96,7 +98,14 @@ public class UserManager {
         return null;
     }
 
-    //TODO
+    public String getImagePath() {
+        if (userDoc.get("imagePath") != null) {
+            return userDoc.get("imagePath").toString();
+        }
+        return "";
+    }
+
+
     public interface onGetProfilePictureListener {
         void onSuccess(String downloadLink);
         void onFailure();
@@ -325,32 +334,53 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void update(String name, String email, String role, String imagePath, onUpdateListener listener) {
-        // Update group
-        Map<String, Object> groupUpdate = new HashMap<>();
-        groupUpdate.put("name", name);
-        groupUpdate.put("role", role);
-        groupUpdate.put("imagePath", imagePath);
-        db.collection("FamilyGroups")
-                .document(getGroupID()).collection("Members").document(getID())
-                .set(groupUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
-                    if(!update.isSuccessful()) {
+    public void update(String name, String email, String role, String pw, String imagePath, onUpdateListener listener) {
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(getEmail(), pw);
+        mAuth.getCurrentUser().reauthenticate(credential)
+                .addOnCompleteListener(reAuth -> {
+                    if(!reAuth.isSuccessful()) {
                         listener.onFailure();
                     }
+                    Log.d("reAUTH", "User re-authenticated.");
+
+                    // Update group
+                    Map<String, Object> groupUpdate = new HashMap<>();
+                    groupUpdate.put("name", name);
+                    groupUpdate.put("role", role);
+                    groupUpdate.put("imagePath", imagePath);
+                    db.collection("FamilyGroups")
+                            .document(getGroupID()).collection("Members").document(getID())
+                            .set(groupUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if(!update.isSuccessful()) {
+                                    listener.onFailure();
+                                }
+                            });
+
+                    // Update user
+                    Map<String, Object> userUpdate = new HashMap<>();
+                    userUpdate.put("name", name);
+                    userUpdate.put("role", role);
+                    userUpdate.put("imagePath", imagePath);
+                    mAuth.getCurrentUser()
+                            .updateEmail(email)
+                            .addOnCompleteListener(update -> {
+                                if (update.isSuccessful()) {
+                                    Log.d("emailUpdate", "User email address updated.");
+                                } else {
+                                    Log.d("emailUpdate", "User email address update failed. " + update.getException().getMessage());
+                                }
+                            });
+
+                    db.collection("Users").document(getID())
+                            .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if(!update.isSuccessful()) {
+                                    listener.onFailure();
+                                }
+                            });
+                    listener.onSuccess();
                 });
-        //TODO update email
-        // Update user
-        Map<String, Object> userUpdate = new HashMap<>();
-        userUpdate.put("name", name);
-        userUpdate.put("role", role);
-        userUpdate.put("imagePath", imagePath);
-        db.collection("Users").document(getID())
-                .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
-                    if(!update.isSuccessful()) {
-                        listener.onFailure();
-                    }
-                });
-        listener.onSuccess();
+
     }
 
     // Creates invite code

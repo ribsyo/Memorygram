@@ -62,7 +62,7 @@
             android:fontFamily="@font/nunito"
             android:clickable="true"
             android:focusable="true"
-            android:padding="10dp"
+            android:padding="15dp"
             android:background="?attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -106,6 +106,25 @@
             android:drawableTint="@color/blue"
             android:drawablePadding="10dp"/>
 
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="275dp"
+            android:layout_height="55dp"
+            android:layout_marginTop="140dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/ic_edit"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/blue"
+            android:fontFamily="@font/nunito"
+            android:hint="Current Passsword"
+            android:paddingStart="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/username" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -137,12 +156,12 @@
             android:id="@+id/save_btn"
             android:layout_width="275dp"
             android:layout_height="55dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="68dp"
             android:backgroundTint="@color/blue"
+            android:fontFamily="@font/nunito"
             android:text="Save"
             android:textColor="@color/white"
             android:textSize="14sp"
-            android:fontFamily="@font/nunito"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
