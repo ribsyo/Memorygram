@@ -2,6 +2,8 @@ package com.cmpt.memogram.classes;
 
 import android.util.Log;
 
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -17,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UserManager {
@@ -81,6 +84,49 @@ public class UserManager {
         }
         return null;
     }
+    public String getRole() {
+        if (userDoc.get("role") != null) {
+            return userDoc.get("role").toString();
+        }
+        return null;
+    }
+
+    public String getEmail() {
+        if (mAuth.getCurrentUser() != null) {
+            return mAuth.getCurrentUser().getEmail();
+        }
+        return null;
+    }
+
+    public String getImagePath() {
+        if (userDoc.get("imagePath") != null) {
+            return userDoc.get("imagePath").toString();
+        }
+        return "";
+    }
+
+
+    public interface onGetProfilePictureListener {
+        void onSuccess(String downloadLink);
+        void onFailure();
+    }
+    public String getProfilePicture(onGetProfilePictureListener listener) {
+        if (userDoc.get("imagePath") != null) {
+            getMedia(userDoc.get("imagePath").toString(), new OnGetFileListener() {
+                @Override
+                public void onSuccess(String downloadLink) {
+                    listener.onSuccess(downloadLink);
+                }
+
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+            });
+
+        }
+        return "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/profilePictures%2FUntitled.jpg?alt=media&token=e97c16d5-86bd-4a86-8498-89148ad8ee0b";
+    }
 
     // Logs in with provided credentials returns true on success
     public interface onLoginListener {
@@ -131,7 +177,9 @@ public class UserManager {
                         Log.d("register", "createUserWithEmail:success");
                         Map<String, String> newUser = new HashMap<>();
                         newUser.put("groupID", "");
+                        newUser.put("role", "");
                         newUser.put("name", name);
+                        newUser.put("imagePath", "profilePictures/Untitled.jpg");
 
                         db.collection("Users").document(getID())
                                 .set(newUser, SetOptions.merge());
@@ -149,7 +197,7 @@ public class UserManager {
         void onSuccess();
         void onFailure(String message);
     }
-    private void getUserDoc(onGetUserDocListener listener) {
+    public void getUserDoc(onGetUserDocListener listener) {
         DocumentReference docRef = db.collection("Users")
                 .document(getID());
         docRef.get().addOnCompleteListener(getUser -> {
@@ -158,6 +206,8 @@ public class UserManager {
                 if (document.exists()) {
                     userDoc.put("name", document.getData().get("name"));
                     userDoc.put("groupID", document.getData().get("groupID"));
+                    userDoc.put("role", document.getData().get("role"));
+                    userDoc.put("imagePath", document.getData().get("imagePath"));
                     listener.onSuccess();
                 } else {
                     Log.d("getUser", "No such document");
@@ -175,9 +225,9 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void joinGroup(String groupJoinCode, onJoinGroupListener listener) {
+    public void joinGroup(String groupJoinCode, String role, onJoinGroupListener listener) {
         DocumentReference docRef = db.collection("Invites")
-                .document(groupJoinCode);
+                .document(groupJoinCode.toUpperCase());
         docRef.get().addOnCompleteListener(getGroup -> {
             if (getGroup.isSuccessful()) {
                 DocumentSnapshot document = getGroup.getResult();
@@ -187,16 +237,19 @@ public class UserManager {
                     // Update user
                     Map<String, Object> userUpdate = new HashMap<>();
                     userUpdate.put("groupID", groupJoinID);
+                    userUpdate.put("role", role);
                     db.collection("Users").document(getID())
                             .set(userUpdate, SetOptions.merge());
                     // Update group
                     Map<String, Object> groupUpdate = new HashMap<>();
                     groupUpdate.put("name", getName());
+                    groupUpdate.put("role", role);
+                    groupUpdate.put("imagePath", userDoc.get("imagePath")).toString();
                     db.collection("FamilyGroups")
                             .document(groupJoinID).collection("Members")
                             .document(getID())
                             .set(groupUpdate, SetOptions.merge());
-                    db.collection("Invites").document(groupJoinCode).delete();
+                    db.collection("Invites").document(groupJoinCode.toUpperCase()).delete();
                     listener.onSuccess();
                 } else {
                     Log.d("joinGroup", "No such invite document");
@@ -228,6 +281,7 @@ public class UserManager {
         // Update user
         Map<String, Object> userUpdate = new HashMap<>();
         userUpdate.put("groupID", "");
+        userUpdate.put("role", "");
         db.collection("Users").document(getID())
                 .set(userUpdate, SetOptions.merge()).addOnCompleteListener(delete -> {
                     if(!delete.isSuccessful()) {
@@ -242,7 +296,7 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void createGroup(String name, onCreateGroupListener listener) {
+    public void createGroup(String name, String role, onCreateGroupListener listener) {
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
@@ -255,7 +309,7 @@ public class UserManager {
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
                             .set(admin, SetOptions.merge());
-                    joinGroup(createdGroupID, new onJoinGroupListener() {
+                    joinGroup(createdGroupID, role, new onJoinGroupListener() {
                         @Override
                         public void onSuccess() {
                             Log.d("createGroup", "Created and joined");
@@ -273,6 +327,60 @@ public class UserManager {
                     Log.w("Create Group", "Error adding document");
                     listener.onFailure();
                 });
+    }
+
+    // Updates group role
+    public interface onUpdateListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void update(String name, String email, String role, String pw, String imagePath, onUpdateListener listener) {
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(getEmail(), pw);
+        mAuth.getCurrentUser().reauthenticate(credential)
+                .addOnCompleteListener(reAuth -> {
+                    if(!reAuth.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                    Log.d("reAUTH", "User re-authenticated.");
+
+                    // Update group
+                    Map<String, Object> groupUpdate = new HashMap<>();
+                    groupUpdate.put("name", name);
+                    groupUpdate.put("role", role);
+                    groupUpdate.put("imagePath", imagePath);
+                    db.collection("FamilyGroups")
+                            .document(getGroupID()).collection("Members").document(getID())
+                            .set(groupUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if(!update.isSuccessful()) {
+                                    listener.onFailure();
+                                }
+                            });
+
+                    // Update user
+                    Map<String, Object> userUpdate = new HashMap<>();
+                    userUpdate.put("name", name);
+                    userUpdate.put("role", role);
+                    userUpdate.put("imagePath", imagePath);
+                    mAuth.getCurrentUser()
+                            .updateEmail(email)
+                            .addOnCompleteListener(update -> {
+                                if (update.isSuccessful()) {
+                                    Log.d("emailUpdate", "User email address updated.");
+                                } else {
+                                    Log.d("emailUpdate", "User email address update failed. " + update.getException().getMessage());
+                                }
+                            });
+
+                    db.collection("Users").document(getID())
+                            .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if(!update.isSuccessful()) {
+                                    listener.onFailure();
+                                }
+                            });
+                    listener.onSuccess();
+                });
+
     }
 
     // Creates invite code
@@ -365,7 +473,7 @@ public class UserManager {
                 }
                 listener.onSuccess(members);
             } else {
-                Log.d("getGroupMemebers", "Error getting documents: ", getMembers.getException());
+                Log.d("getGroupMembers", "Error getting documents: ", getMembers.getException());
                 listener.onFailure();
             }
         });
