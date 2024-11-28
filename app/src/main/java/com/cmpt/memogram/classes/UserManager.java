@@ -480,7 +480,7 @@ public class UserManager {
     }
 
     public void getMedia(String path, final OnGetFileListener listener) {
-        StorageReference fileRef = storageRef.child("alexGroup/6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg");
+        StorageReference fileRef = storageRef.child(path);
 
         fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
             // File download URL retrieved successfully

@@ -22,11 +22,16 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.classes.PostUpload;
 import com.cmpt.memogram.classes.UserManager;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -123,21 +128,55 @@ public class EditProfileFragment extends Fragment {
 
 
                     Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
-                    String imPath = um.getImagePath();
-                    //TODO upload image logic
+                    String imPath = "profilePictures/" + um.getID().toString() + ".jpeg";
+                    // Upload image file
+                    StorageReference imageRef = FirebaseStorage
+                            .getInstance()
+                            .getReference()
+                            .child(imPath);
 
-                    um.update(name, email, role, pw, imPath, new UserManager.onUpdateListener() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
-                            getParentFragmentManager().popBackStack();
+
+                    StorageMetadata imageMetadata = new StorageMetadata.Builder()
+                        .setContentType("image/jpeg")
+                        .build();
+
+                    try {
+                        InputStream inputStream = getContext().getContentResolver().openInputStream(selectedImageUri);
+                        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+                        int bufferSize = 1024;
+                        byte[] buffer = new byte[bufferSize];
+                        int len;
+                        while ((len = inputStream.read(buffer)) != -1) {
+                            byteBuffer.write(buffer, 0, len);
                         }
-                        @Override
-                        public void onFailure() {
-                            saveButton.setEnabled(true);
-                            Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                        imageBytes = byteBuffer.toByteArray();
+
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "Error preparing image", Toast.LENGTH_SHORT).show();
+                    }
+
+                    imageRef.putBytes(imageBytes, imageMetadata)
+                            .addOnSuccessListener(imageTaskSnapshot -> {
+                                imageRef.getDownloadUrl().addOnSuccessListener(imageUri -> {
+                                    um.update(name, email, role, pw, imPath, new UserManager.onUpdateListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
+                                            getParentFragmentManager().popBackStack();
+                                        }
+                                        @Override
+                                        public void onFailure() {
+                                            saveButton.setEnabled(true);
+                                            Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                });
+                        });
+
+
             }
         });
         return view;
