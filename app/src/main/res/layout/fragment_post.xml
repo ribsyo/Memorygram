@@ -136,6 +136,25 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/DatePickerButton"
+                android:layout_width="350dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="@color/light_green"
+                android:drawableLeft="@drawable/ic_calendar"
+                android:drawableTint="@color/yellow"
+                android:fontFamily="@font/ptsans"
+                android:text="@string/select_date"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:cornerRadius="8dp"
+                app:elevation="4dp"
+                app:strokeColor="@color/dark_green"
+                app:strokeWidth="1dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

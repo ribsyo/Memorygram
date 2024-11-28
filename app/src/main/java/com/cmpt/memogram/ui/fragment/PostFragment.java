@@ -31,6 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import android.Manifest;
 import android.database.Cursor;
+import android.app.DatePickerDialog;
+import android.widget.DatePicker;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 
 public class PostFragment extends Fragment {
@@ -46,12 +51,15 @@ public class PostFragment extends Fragment {
     private Uri selectedImageUri;
     private byte[] imageBytes;
     private byte[] audioBytes;
-    private String selectedImageFileName;
 
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private String audioFilePath;
     private boolean isRecording = false;
+    private boolean hasAudioRecording = false;
+
+    private Button datePickerButton;
+    private Date selectedDate;
 
 
     @Override
@@ -66,6 +74,17 @@ public class PostFragment extends Fragment {
         postButton = view.findViewById(R.id.Post);
         audioButton = view.findViewById(R.id.Audio);
         playbackButton = view.findViewById(R.id.PlayBack);
+        datePickerButton = view.findViewById(R.id.DatePickerButton);
+
+        selectedDate = new Date();
+        updateDateButtonText();
+
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +101,7 @@ public class PostFragment extends Fragment {
                         startRecording();
                     } else {
                         stopRecording();
+                        hasAudioRecording = true;
                     }
                 } else {
                     requestPermissions();
@@ -100,7 +120,7 @@ public class PostFragment extends Fragment {
                         stopPlayback();
                     }
                 } else {
-                    Toast.makeText(getContext(), "Record audio first", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_record_audio_first, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -117,10 +137,15 @@ public class PostFragment extends Fragment {
                     String tags = tagsEditText.getText().toString().trim();
                     String title = titleEditText.getText().toString();
 
-                    String finalTags = tags.isEmpty() ? "none" : tags;
+                    String finalTags = tags.isEmpty() ? getString(R.string.no_tag) : tags;
 
                     prepareImageBytes();
-                    prepareAudioBytes();
+
+
+                    if (hasAudioRecording) {
+                        prepareAudioBytes();
+                    }
+
 
                     PostData postData = new PostData(
                             imageBytes,
@@ -129,19 +154,16 @@ public class PostFragment extends Fragment {
                             audioBytes
                     );
 
-                    //String title = getFileName(selectedImageUri);
-                    //byte[] audioData = new byte[1];
-
-                    Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_creating_post, Toast.LENGTH_SHORT).show();
 
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), new OnUploadPostListener() {
+                    OnUploadPostListener uploadListener = new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
-                            System.out.println("Post uploaded successfully.");
+                            System.out.println(getString(R.string.post_upload_success));
                             if (getActivity() != null) {
                                 getActivity().getSupportFragmentManager().beginTransaction()
                                         .replace(R.id.fragment_container, new HomeFragment())
@@ -151,21 +173,30 @@ public class PostFragment extends Fragment {
 
                         @Override
                         public void onFailure() {
-                            System.out.println("Failed to upload post.");
+                            System.out.println(getString(R.string.post_upload_fail));
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         postButton.setEnabled(true);
-                                        Toast.makeText(getContext(), "Failed to upload post. Please try again.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), R.string.toast_post_upload_failed, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
                         }
-                    });
+                    };
+
+                    byte[] safeAudioBytes = (hasAudioRecording && audioBytes != null) ? audioBytes : new byte[0];
+
+                    // Choose upload method based on audio presence
+                    if (hasAudioRecording) {
+                        postManager.uploadPost(title, caption, safeAudioBytes, imageBytes, finalTags, new Date(), uploadListener);
+                    } else {
+                        postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), uploadListener);
+                    }
 
                 } else {
-                    Toast.makeText(getContext(), "Please select an image first", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_image_required, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -186,33 +217,9 @@ public class PostFragment extends Fragment {
             selectedImageUri = data.getData();
             if (selectedImageUri != null) {
                 imageButton.setImageURI(selectedImageUri);
-                //get file name
-                selectedImageFileName = getFileName(selectedImageUri);
-                if (selectedImageFileName != null) {
-                    Toast.makeText(getContext(), "Selected file: " + selectedImageFileName, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
 
-    private String getFileName(Uri uri) {
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            try (Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null)) {
-                if (cursor != null && cursor.moveToFirst()) {
-                    int index = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
-                    if (index != -1) {
-                        result = cursor.getString(index);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
-        if (result == null) {
-            result = uri.getLastPathSegment();
-        }
-        return result;
     }
 
     private void prepareImageBytes() {
@@ -253,6 +260,7 @@ public class PostFragment extends Fragment {
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         mediaRecorder.setOutputFile(audioFilePath);
+        hasAudioRecording = false;
 
         try {
             mediaRecorder.prepare();
@@ -280,7 +288,13 @@ public class PostFragment extends Fragment {
                 Toast.makeText(getContext(), "Error stopping recording", Toast.LENGTH_SHORT).show();
             }
         }
+        hasAudioRecording = true;
     }
+
+    private void setHasAudioRecording(boolean hasAudio) {
+        this.hasAudioRecording = hasAudio;
+    }
+
 
     private void playAudio() {
         mediaPlayer = new MediaPlayer();
@@ -325,6 +339,8 @@ public class PostFragment extends Fragment {
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Error preparing audio", Toast.LENGTH_SHORT).show();
             }
+//        } else {
+//            audioBytes = new byte[0];
         }
     }
 
@@ -356,13 +372,40 @@ public class PostFragment extends Fragment {
         audioFilePath = null;
         audioButton.setText("AUDIO");
         playbackButton.setText("PLAYBACK");
-        selectedImageFileName = null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         cleanupMediaResources();
+    }
+
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(selectedDate);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        Calendar selectedCalendar = Calendar.getInstance();
+                        selectedCalendar.set(year, month, dayOfMonth);
+                        selectedDate = selectedCalendar.getTime();
+                        updateDateButtonText();
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
+    }
+
+    private void updateDateButtonText() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        datePickerButton.setText(sdf.format(selectedDate));
     }
 
 
