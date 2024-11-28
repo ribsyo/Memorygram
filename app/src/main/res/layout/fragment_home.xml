@@ -1,27 +1,64 @@
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipe_refresh_layout"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="70dp"
-    android:background="@color/dark_green">
+    android:layout_height="match_parent">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:background="@color/dark_green">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/windowBackground">
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/bar"/>
+        </RelativeLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:layout_centerHorizontal="true">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/bar"
-            android:background="?android:attr/windowBackground">
-        </com.google.android.material.appbar.AppBarLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/scroll_to_top_btn"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/blue"
+            android:padding="13.5dp"
+            android:layout_marginBottom="60dp"
+            android:alpha="0.6"
+            app:icon="@drawable/ic_up"
+            app:iconTint="@color/white"
+            app:cornerRadius="30dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/bar"
-            android:id="@+id/recycler_view"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/scroll_to_bottom_btn"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="60dp"
+            android:backgroundTint="@color/blue"
+            android:padding="13.5dp"
+            android:alpha="0.6"
+            app:icon="@drawable/ic_down"
+            app:iconTint="@color/white"
+            app:cornerRadius="30dp" />
     </RelativeLayout>
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</RelativeLayout>

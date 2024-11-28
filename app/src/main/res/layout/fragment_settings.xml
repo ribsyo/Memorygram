@@ -59,6 +59,7 @@
             android:backgroundTint="@color/sage"
             android:text="@string/generate_one_time_code"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@color/white" />
 
@@ -72,6 +73,7 @@
             android:backgroundTint="@color/sage"
             android:text="@string/edit_profile"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@color/white" />
 
@@ -86,6 +88,7 @@
             android:backgroundTint="@color/sage"
             android:text="@string/manage_family"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
         <!-- Leave Family Button  -->
@@ -99,6 +102,7 @@
             android:backgroundTint="@color/sage"
             android:text="@string/leave_family"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
     </LinearLayout>
