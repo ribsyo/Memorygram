@@ -31,6 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import android.Manifest;
 import android.database.Cursor;
+import android.app.DatePickerDialog;
+import android.widget.DatePicker;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 
 public class PostFragment extends Fragment {
@@ -53,6 +58,9 @@ public class PostFragment extends Fragment {
     private String audioFilePath;
     private boolean isRecording = false;
 
+    private Button datePickerButton;
+    private Date selectedDate;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +74,17 @@ public class PostFragment extends Fragment {
         postButton = view.findViewById(R.id.Post);
         audioButton = view.findViewById(R.id.Audio);
         playbackButton = view.findViewById(R.id.PlayBack);
+        datePickerButton = view.findViewById(R.id.DatePickerButton);
+
+        selectedDate = new Date();
+        updateDateButtonText();
+
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,7 +157,7 @@ public class PostFragment extends Fragment {
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), new OnUploadPostListener() {
+                    postManager.uploadPost(title, caption, imageBytes, finalTags, selectedDate, new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
@@ -325,6 +344,8 @@ public class PostFragment extends Fragment {
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Error preparing audio", Toast.LENGTH_SHORT).show();
             }
+//        } else {
+//            audioBytes = new byte[0];
         }
     }
 
@@ -363,6 +384,34 @@ public class PostFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         cleanupMediaResources();
+    }
+
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(selectedDate);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        Calendar selectedCalendar = Calendar.getInstance();
+                        selectedCalendar.set(year, month, dayOfMonth);
+                        selectedDate = selectedCalendar.getTime();
+                        updateDateButtonText();
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
+    }
+
+    private void updateDateButtonText() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        datePickerButton.setText(sdf.format(selectedDate));
     }
 
 
