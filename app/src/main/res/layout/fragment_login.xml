@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dark_green"
-    tools:context=".ui.fragment.LoginFragment"
+    tools:context=".ui.fragment.LoginFragment">
 
     <!-- Title above the logo -->
     <TextView
