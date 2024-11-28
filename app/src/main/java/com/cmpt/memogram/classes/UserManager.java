@@ -15,11 +15,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UserManager {
@@ -35,19 +35,15 @@ public class UserManager {
             this.getUserDoc(new onGetUserDocListener() {
                 @Override
                 public void onSuccess() {
-                    getGroupMembers(new onGetGroupMembersListener() {
+                    createGroup("test", new onCreateGroupListener() {
                         @Override
-                        public void onSuccess(List<User> users) {
-
+                        public void onSuccess() {
                         }
-
                         @Override
                         public void onFailure() {
-
                         }
                     });
                 }
-
                 @Override
                 public void onFailure(String message) {
                     Log.d("userMan initialize", message);
@@ -296,7 +292,7 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void createGroup(String name, String role, onCreateGroupListener listener) {
+    public void createGroup(String name, onCreateGroupListener listener) {
         Map<String, String> data = new HashMap<>();
         data.put("name", name);
         db.collection("FamilyGroups").add(data)
@@ -304,12 +300,14 @@ public class UserManager {
                     String createdGroupID = documentReference.getId();
 
                     // Sets creator as admin and joins
-                    Map<String, String> admin = new HashMap<>();
-                    admin.put("admin", getID());
+                    Map<String, Object> group = new HashMap<>();
+                    group.put("admin", getID());
+                    group.put("name", name);
+                    group.put("tags", Arrays.asList("none"));
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
-                            .set(admin, SetOptions.merge());
-                    joinGroup(createdGroupID, role, new onJoinGroupListener() {
+                            .set(group, SetOptions.merge());
+                    joinGroup(createdGroupID, userDoc.get("role").toString(), new onJoinGroupListener() {
                         @Override
                         public void onSuccess() {
                             Log.d("createGroup", "Created and joined");
