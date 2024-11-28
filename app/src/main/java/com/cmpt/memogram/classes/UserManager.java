@@ -3,12 +3,18 @@ package com.cmpt.memogram.classes;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,6 +22,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class UserManager {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final StorageReference storageRef = storage.getReference();
+
     Map<String, Object> userDoc = new HashMap<>();
 
     public UserManager() {
@@ -23,6 +32,17 @@ public class UserManager {
             this.getUserDoc(new onGetUserDocListener() {
                 @Override
                 public void onSuccess() {
+                    getGroupMembers(new onGetGroupMembersListener() {
+                        @Override
+                        public void onSuccess(List<User> users) {
+
+                        }
+
+                        @Override
+                        public void onFailure() {
+
+                        }
+                    });
                 }
 
                 @Override
@@ -302,9 +322,65 @@ public class UserManager {
         Log.d("randomCode", code.toString());
         return code.toString();
     }
-    // TODO: Output members of group
-    // public String[] getGroupMembers() {
-    //   return null;
-    // }
+    public interface onGetGroupMembersListener {
+        void onSuccess(List<User> users);
+        void onFailure();
+    }
+    public void getGroupMembers(onGetGroupMembersListener listener) {
+        CollectionReference membersCollection = db.collection("FamilyGroups")
+                .document(getGroupID())
+                .collection("Members");
+
+        membersCollection.get().addOnCompleteListener(getMembers -> {
+            if (getMembers.isSuccessful()) {
+                List<User> members = new ArrayList<>();
+                for (QueryDocumentSnapshot document : getMembers.getResult()) {
+                    User member = new User();
+                    member.ID = document.getId();
+                    member.name = document.getData().get("name") != null ?
+                            document.getData().get("name").toString() : "NAME BLANK";
+                    member.imagePath = "alexGroup/6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg";
+                    getMedia(member.imagePath, new OnGetFileListener() {
+                        @Override
+                        public void onSuccess(String downloadLink) {
+                            System.out.println("got image file");
+                            member.imageDownloadLink = downloadLink;
+                            member.role = document.getData().get("role") != null ?
+                                    document.getData().get("role").toString() : "";
+                            members.add(member);
+                        }
+                        @Override
+                        public void onFailure() {
+                            // Handle the failure
+                            member.imageDownloadLink = "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
+                            member.role = document.getData().get("role") != null ?
+                                    document.getData().get("role").toString() : "";
+                            members.add(member);
+                        }
+                    });
+                    member.role = document.getData().get("role") != null ?
+                            document.getData().get("role").toString() : "";
+                    Log.d("getGroupMembers", member.imagePath + " " + member.imageDownloadLink + " " + member.name + " " + member.role);
+                    members.add(member);
+                }
+                listener.onSuccess(members);
+            } else {
+                Log.d("getGroupMemebers", "Error getting documents: ", getMembers.getException());
+                listener.onFailure();
+            }
+        });
+    }
+
+    public void getMedia(String path, final OnGetFileListener listener) {
+        StorageReference fileRef = storageRef.child(path);
+
+        fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            // File download URL retrieved successfully
+            listener.onSuccess(uri.toString());
+        }).addOnFailureListener(exception -> {
+            // Handle any errors
+            listener.onFailure();
+        });
+    }
 
 }
