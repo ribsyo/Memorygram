@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SETTINGS"
+                android:text="@string/settings"
                 android:fontFamily="@font/nunito"
                 android:paddingTop="16dp"
                 android:textStyle="bold"
@@ -85,8 +85,9 @@
             android:layout_height="50dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/sage"
-            android:text="Generate One-Time Code"
+            android:text="@string/generate_one_time_code"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@color/white" />
 
@@ -109,8 +110,9 @@
             android:layout_height="50dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/sage"
-            android:text="Edit Profile"
+            android:text="@string/edit_profile"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@color/white" />
 
@@ -123,8 +125,9 @@
             android:layout_marginTop="16dp"
             android:textSize="14sp"
             android:backgroundTint="@color/sage"
-            android:text="Manage Family"
+            android:text="@string/manage_family"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
         <!-- Leave Family Button  -->
@@ -136,8 +139,9 @@
             android:layout_marginTop="16dp"
             android:textSize="14sp"
             android:backgroundTint="@color/sage"
-            android:text="Leave Family"
+            android:text="@string/leave_family"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
     </LinearLayout>

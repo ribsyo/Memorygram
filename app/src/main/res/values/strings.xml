@@ -3,21 +3,44 @@
     <string name="logo">Logo</string>
     <string name="view_collection">View Collection</string>
     <string name="post">Post</string>
-
-    <!-- Strings used for settings_layout.xml  -->
-    <string name="settings">SETTINGS</string>
-    <string name="greater_than">></string>"
-    <string name="generate_one_time_code">GENERATE ONE-TIME CODE</string>
-    <string name="manage_family">MANAGE FAMILY</string>
-    <string name="leave_family">LEAVE FAMILY GROUP</string>
-
-    <!-- Strings used for post_layout.xml  -->
-    <string name="create_post">CREATE POST</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_post">Create Post</string>
     <string name="upload_image">Upload an image</string>
-    <string name="write_caption">Write a caption...</string>
-    <string name="add_tags">Add tags</string>
+    <string name="write_caption">WRITE CAPTION</string>
+    <string name="write_title">WRITE TITLE</string>
+    <string name="add_tags">ADD TAGS</string>
     <string name="audio">Audio</string>
     <string name="play_back">Play Back</string>
+    <string name="select_date">SELECT DATE</string>
+    <string name="record_audio">RECORD AUDIO</string>
+    <string name="audio_playback">AUDIO PLAYBACK</string>
+    <string name="no_tag">none</string>
+
+    <string name="edit_profile">Edit Profile</string>
+    <string name="manage_family">Manage Family</string>
+    <string name="leave_family">Leave Family Group</string>
+    <string name="title">Title</string>
+    <string name="posted_date">Posted Date</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="description">Description</string>
+
+    <string name="settings">Settings</string>
+    <string name="generate_one_time_code">Generate One-Time Code</string>
+
+    <string name="toast_image_required">Please select an image first</string>
+    <string name="toast_creating_post">Creating post…</string>
+    <string name="toast_post_upload_failed">Failed to upload post. Please try again.</string>
+    <string name="toast_recording_started">Recording started</string>
+    <string name="toast_recording_stopped">Recording stopped</string>
+    <string name="toast_recording_failed">Failed to start recording</string>
+    <string name="toast_playback_failed">Failed to play audio</string>
+    <string name="toast_record_audio_first">Record audio first</string>
+
+    <string name="post_upload_success">Post uploaded successfully.</string>
+    <string name="post_upload_fail">Failed to upload post.</string>
 
     <string-array name="Roles">
         <item>Son</item>

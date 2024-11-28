@@ -1,6 +1,10 @@
 package com.cmpt.memogram.ui.fragment;
 
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +25,9 @@ public class SettingsFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         userManager = new UserManager();
@@ -74,12 +80,35 @@ public class SettingsFragment extends Fragment {
         editProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, new EditProfileFragment());
-                transaction.addToBackStack(null); // Optional: add to back stack to allow user to navigate back
-                transaction.commit();
+                // Create an AlertDialog to confirm the action
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Leave Family Group")
+                        .setMessage("Are you sure you want to leave the family group?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Call the leaveGroup method from UserManager
+                            userManager.leaveGroup(new UserManager.onLeaveGroupListener() {
+                                @Override
+                                public void onSuccess() {
+                                    // Handle success
+                                    Toast.makeText(getContext(), "Left the family group successfully.", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    // Handle failure
+                                    Toast.makeText(getContext(), "Failed to leave the family group.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            // Dismiss the dialog
+                            dialog.dismiss();
+                        })
+                        .create()
+                        .show();
             }
         });
+
 
         return view;
     }

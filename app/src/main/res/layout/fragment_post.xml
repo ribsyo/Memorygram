@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:fontFamily="@font/nunito"
-                android:text="CREATE POST"
+                android:text="@string/create_post"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -58,7 +58,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/grey"
-                    android:contentDescription="UPLOAD IMAGE"
+                    android:contentDescription="@string/upload_image"
                     android:scaleType="centerInside"
                     tools:srcCompat="@android:drawable/stat_sys_upload_done" />
 
@@ -69,7 +69,7 @@
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="WRITE TITLE"
+                android:hint="@string/write_title"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -93,7 +93,7 @@
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="WRITE CAPTION"
+                android:hint="@string/write_caption"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -117,7 +117,7 @@
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:hint="ADD TAGS"
+                android:hint="@string/add_tags"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -136,6 +136,25 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/DatePickerButton"
+                android:layout_width="350dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="@color/light_green"
+                android:drawableLeft="@drawable/ic_calendar"
+                android:drawableTint="@color/yellow"
+                android:fontFamily="@font/ptsans"
+                android:text="@string/select_date"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:cornerRadius="8dp"
+                app:elevation="4dp"
+                app:strokeColor="@color/dark_green"
+                app:strokeWidth="1dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -149,7 +168,7 @@
                     android:layout_height="75dp"
                     android:layout_marginEnd="20dp"
                     android:backgroundTint="@color/light_green"
-                    android:text="RECORD AUDIO"
+                    android:text="@string/record_audio"
                     android:textColor="@color/white"
                     android:fontFamily="@font/ptsans"
                     app:cornerRadius="8dp"
@@ -166,7 +185,7 @@
                     android:layout_height="75dp"
                     android:backgroundTint="@color/light_green"
                     android:fontFamily="@font/ptsans"
-                    android:text="AUDIO PLAYBACK"
+                    android:text="@string/audio_playback"
                     android:textColor="@color/white"
                     app:cornerRadius="8dp"
                     app:elevation="4dp"
@@ -185,7 +204,7 @@
                 android:layout_gravity="center"
                 android:backgroundTint="@color/light_green"
                 android:fontFamily="@font/ptsans"
-                android:text="POST"
+                android:text="@string/post"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 app:cornerRadius="12dp"

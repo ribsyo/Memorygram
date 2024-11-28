@@ -6,7 +6,7 @@ public class PostUpload {
     public String text;
     public Date datePosted;
     public Date dateListed;
-    boolean includeAudio;
+    public boolean includeAudio;
     public String tag;
     public String audioPath;
     public String imagePath;
