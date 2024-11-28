@@ -157,7 +157,7 @@ public class PostFragment extends Fragment {
                     FirebaseStorage fs = FirebaseStorage.getInstance();
                     PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
 
-                    postManager.uploadPost(title, caption, imageBytes, finalTags, selectedDate, new OnUploadPostListener() {
+                    OnUploadPostListener uploadListener = new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
                             System.out.println("Post uploaded successfully.");
@@ -181,7 +181,13 @@ public class PostFragment extends Fragment {
                                 });
                             }
                         }
-                    });
+                    };
+                    // Choose upload method based on audio presence
+                    if (hasAudioRecording) {
+                        postManager.uploadPost(title, caption, audioBytes, imageBytes, finalTags, new Date(), uploadListener);
+                    } else {
+                        postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), uploadListener);
+                    }
 
                 } else {
                     Toast.makeText(getContext(), "Please select an image first", Toast.LENGTH_SHORT).show();
