@@ -62,6 +62,27 @@ public class UserManager {
         }
         return null;
     }
+    public String getRole() {
+        if (userDoc.get("role") != null) {
+            return userDoc.get("role").toString();
+        }
+        return null;
+    }
+
+    //TODO
+    public String getEmail() {
+        if (userDoc.get("role") != null) {
+            return"test45@test.ca";
+        }
+        return null;
+    }
+
+    //TODO
+    public String getProfilePicture() {
+        if (userDoc.get("imagePath") != null) {
+        }
+        return "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
+    }
 
     // Logs in with provided credentials returns true on success
     public interface onLoginListener {
@@ -132,7 +153,7 @@ public class UserManager {
         void onSuccess();
         void onFailure(String message);
     }
-    private void getUserDoc(onGetUserDocListener listener) {
+    public void getUserDoc(onGetUserDocListener listener) {
         DocumentReference docRef = db.collection("Users")
                 .document(getID());
         docRef.get().addOnCompleteListener(getUser -> {
@@ -265,14 +286,16 @@ public class UserManager {
     }
 
     // Updates group role
-    public interface onUpdateRoleListener {
+    public interface onUpdateListener {
         void onSuccess();
         void onFailure();
     }
-    public void updateRole(String role, onUpdateRoleListener listener) {
+    public void update(String name, String email, String role, String imagePath, onUpdateListener listener) {
         // Update group
         Map<String, Object> groupUpdate = new HashMap<>();
+        groupUpdate.put("name", name);
         groupUpdate.put("role", role);
+        groupUpdate.put("imagePath", imagePath);
         db.collection("FamilyGroups")
                 .document(getGroupID()).collection("Members").document(getID())
                 .set(groupUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
@@ -280,10 +303,12 @@ public class UserManager {
                         listener.onFailure();
                     }
                 });
-
+        //TODO update email
         // Update user
         Map<String, Object> userUpdate = new HashMap<>();
+        userUpdate.put("name", name);
         userUpdate.put("role", role);
+        userUpdate.put("imagePath", imagePath);
         db.collection("Users").document(getID())
                 .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
                     if(!update.isSuccessful()) {
