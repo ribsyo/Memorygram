@@ -445,7 +445,7 @@ public class UserManager {
                     member.ID = document.getId();
                     member.name = document.getData().get("name") != null ?
                             document.getData().get("name").toString() : "NAME BLANK";
-                    member.imagePath = "alexGroup/6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg";
+                    member.imagePath = document.getData().get("imagePath").toString();
                     getMedia(member.imagePath, new OnGetFileListener() {
                         @Override
                         public void onSuccess(String downloadLink) {
@@ -454,6 +454,8 @@ public class UserManager {
                             member.role = document.getData().get("role") != null ?
                                     document.getData().get("role").toString() : "";
                             members.add(member);
+                            listener.onSuccess(members);
+
                         }
                         @Override
                         public void onFailure() {
@@ -462,14 +464,11 @@ public class UserManager {
                             member.role = document.getData().get("role") != null ?
                                     document.getData().get("role").toString() : "";
                             members.add(member);
+                            listener.onSuccess(members);
                         }
                     });
-                    member.role = document.getData().get("role") != null ?
-                            document.getData().get("role").toString() : "";
-                    Log.d("getGroupMembers", member.imagePath + " " + member.imageDownloadLink + " " + member.name + " " + member.role);
-                    members.add(member);
                 }
-                listener.onSuccess(members);
+
             } else {
                 Log.d("getGroupMembers", "Error getting documents: ", getMembers.getException());
                 listener.onFailure();
