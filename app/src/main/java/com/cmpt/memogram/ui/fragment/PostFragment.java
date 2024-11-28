@@ -51,7 +51,6 @@ public class PostFragment extends Fragment {
     private Uri selectedImageUri;
     private byte[] imageBytes;
     private byte[] audioBytes;
-    private String selectedImageFileName;
 
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
@@ -102,6 +101,7 @@ public class PostFragment extends Fragment {
                         startRecording();
                     } else {
                         stopRecording();
+                        hasAudioRecording = true;
                     }
                 } else {
                     requestPermissions();
@@ -120,7 +120,7 @@ public class PostFragment extends Fragment {
                         stopPlayback();
                     }
                 } else {
-                    Toast.makeText(getContext(), "Record audio first", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_record_audio_first, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -137,25 +137,24 @@ public class PostFragment extends Fragment {
                     String tags = tagsEditText.getText().toString().trim();
                     String title = titleEditText.getText().toString();
 
-                    String finalTags = tags.isEmpty() ? "none" : tags;
+                    String finalTags = tags.isEmpty() ? getString(R.string.no_tag) : tags;
 
                     prepareImageBytes();
+
+
                     if (hasAudioRecording) {
                         prepareAudioBytes();
                     }
 
 
-//                    PostData postData = new PostData(
-//                            imageBytes,
-//                            caption,
-//                            finalTags,
-//                            audioBytes
-//                    );
+                    PostData postData = new PostData(
+                            imageBytes,
+                            caption,
+                            finalTags,
+                            audioBytes
+                    );
 
-                    //String title = getFileName(selectedImageUri);
-                    //byte[] audioData = new byte[1];
-
-                    Toast.makeText(getContext(), "Creating post...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_creating_post, Toast.LENGTH_SHORT).show();
 
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     FirebaseStorage fs = FirebaseStorage.getInstance();
@@ -164,7 +163,7 @@ public class PostFragment extends Fragment {
                     OnUploadPostListener uploadListener = new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {
-                            System.out.println("Post uploaded successfully.");
+                            System.out.println(getString(R.string.post_upload_success));
                             if (getActivity() != null) {
                                 getActivity().getSupportFragmentManager().beginTransaction()
                                         .replace(R.id.fragment_container, new HomeFragment())
@@ -174,27 +173,30 @@ public class PostFragment extends Fragment {
 
                         @Override
                         public void onFailure() {
-                            System.out.println("Failed to upload post.");
+                            System.out.println(getString(R.string.post_upload_fail));
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         postButton.setEnabled(true);
-                                        Toast.makeText(getContext(), "Failed to upload post. Please try again.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), R.string.toast_post_upload_failed, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
                         }
                     };
+
+                    byte[] safeAudioBytes = (hasAudioRecording && audioBytes != null) ? audioBytes : new byte[0];
+
                     // Choose upload method based on audio presence
                     if (hasAudioRecording) {
-                        postManager.uploadPost(title, caption, audioBytes, imageBytes, finalTags, new Date(), uploadListener);
+                        postManager.uploadPost(title, caption, safeAudioBytes, imageBytes, finalTags, new Date(), uploadListener);
                     } else {
                         postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), uploadListener);
                     }
 
                 } else {
-                    Toast.makeText(getContext(), "Please select an image first", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.toast_image_required, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -215,33 +217,9 @@ public class PostFragment extends Fragment {
             selectedImageUri = data.getData();
             if (selectedImageUri != null) {
                 imageButton.setImageURI(selectedImageUri);
-                //get file name
-                selectedImageFileName = getFileName(selectedImageUri);
-                if (selectedImageFileName != null) {
-                    Toast.makeText(getContext(), "Selected file: " + selectedImageFileName, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
 
-    private String getFileName(Uri uri) {
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            try (Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null)) {
-                if (cursor != null && cursor.moveToFirst()) {
-                    int index = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
-                    if (index != -1) {
-                        result = cursor.getString(index);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
-        if (result == null) {
-            result = uri.getLastPathSegment();
-        }
-        return result;
     }
 
     private void prepareImageBytes() {
@@ -394,7 +372,6 @@ public class PostFragment extends Fragment {
         audioFilePath = null;
         audioButton.setText("AUDIO");
         playbackButton.setText("PLAYBACK");
-        selectedImageFileName = null;
     }
 
     @Override
