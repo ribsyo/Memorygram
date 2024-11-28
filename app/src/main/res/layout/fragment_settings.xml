@@ -50,12 +50,40 @@
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
+        <!-- Join Group Button -->
+        <Button
+            android:id="@+id/join_group_btn"
+            android:layout_gravity="center"
+            android:layout_width="350dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/sage"
+            android:text="Join Group"
+            android:fontFamily="@font/ptsans"
+            android:textSize="14sp"
+            android:textColor="@color/white" />
+
+        <!-- One-Time Code Input -->
+        <EditText
+            android:id="@+id/one_time_code_input"
+            android:layout_width="350dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:hint="Enter One-Time Code"
+            android:background="@drawable/rounded_edittext"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
         <!-- Generate One-Time Code Button  -->
         <Button
             android:id="@+id/generate_one_time_code_btn"
             android:layout_gravity="center"
             android:layout_width="350dp"
             android:layout_height="50dp"
+            android:layout_marginTop="16dp"
             android:backgroundTint="@color/sage"
             android:text="@string/generate_one_time_code"
             android:fontFamily="@font/ptsans"
@@ -63,13 +91,24 @@
             android:textSize="14sp"
             android:textColor="@color/white" />
 
+        <!-- One-Time Code Display -->
+        <TextView
+            android:id="@+id/one_time_code_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
         <!-- Edit Profile Button  -->
         <Button
             android:id="@+id/edit_profile_btn"
             android:layout_gravity="center"
             android:layout_width="350dp"
             android:layout_height="50dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:backgroundTint="@color/sage"
             android:text="@string/edit_profile"
             android:fontFamily="@font/ptsans"
@@ -83,7 +122,7 @@
             android:layout_gravity="center"
             android:layout_width="350dp"
             android:layout_height="50dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:textSize="14sp"
             android:backgroundTint="@color/sage"
             android:text="@string/manage_family"
@@ -97,7 +136,7 @@
             android:layout_gravity="center"
             android:layout_width="350dp"
             android:layout_height="50dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:textSize="14sp"
             android:backgroundTint="@color/sage"
             android:text="@string/leave_family"

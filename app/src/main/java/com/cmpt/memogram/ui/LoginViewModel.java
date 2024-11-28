@@ -55,8 +55,8 @@ public class LoginViewModel extends ViewModel {
         });
     }
 
-    public void signUp(String username, String password) {
-        userManager.register(username, password, username, new UserManager.onRegisterListener() {
+    public void signUp(String username, String password, String name, String role) {
+        userManager.register(username, password, name, role, new UserManager.onRegisterListener() {
             @Override
             public void onSuccess() {
                 signUpSuccess.setValue(new Pair<>(true, "Sign-up success"));

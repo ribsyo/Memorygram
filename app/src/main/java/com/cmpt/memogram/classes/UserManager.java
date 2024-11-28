@@ -165,15 +165,14 @@ public class UserManager {
         void onSuccess();
         void onFailure(String message);
     }
-    public void register(String username, String password, String name, onRegisterListener listener) {
+    public void register(String username, String password, String name, String role, onRegisterListener listener) {
         mAuth.createUserWithEmailAndPassword(username, password)
                 .addOnCompleteListener(register -> {
                     if (register.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
                         Log.d("register", "createUserWithEmail:success");
                         Map<String, String> newUser = new HashMap<>();
                         newUser.put("groupID", "");
-                        newUser.put("role", "");
+                        newUser.put("role", role); //this is what i changed to accept role and name
                         newUser.put("name", name);
                         newUser.put("imagePath", "profilePictures/Untitled.jpg");
 
@@ -181,7 +180,6 @@ public class UserManager {
                                 .set(newUser, SetOptions.merge());
                         listener.onSuccess();
                     } else {
-                        // If sign in fails, display a message to the user.
                         Log.w("register", "createUserWithEmail:failure ", register.getException());
                         listener.onFailure(register.getException().getMessage());
                     }
