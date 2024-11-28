@@ -58,7 +58,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/grey"
-                    android:contentDescription="UPLOAD IMAGE"
+                    android:contentDescription="@string/upload_image"
                     android:scaleType="centerInside"
                     tools:srcCompat="@android:drawable/stat_sys_upload_done" />
 
@@ -204,7 +204,7 @@
                 android:layout_gravity="center"
                 android:backgroundTint="@color/light_green"
                 android:fontFamily="@font/ptsans"
-                android:text="POST"
+                android:text="@string/post"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 app:cornerRadius="12dp"

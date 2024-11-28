@@ -3,16 +3,11 @@
     <string name="logo">Logo</string>
     <string name="view_collection">View Collection</string>
     <string name="post">Post</string>
-
-    <!-- Strings used for settings_layout.xml  -->
-    <string name="settings">SETTINGS</string>
-    <string name="greater_than">></string>"
-    <string name="generate_one_time_code">GENERATE ONE-TIME CODE</string>
-    <string name="manage_family">MANAGE FAMILY</string>
-    <string name="leave_family">LEAVE FAMILY GROUP</string>
-
-    <!-- Strings used for post_layout.xml  -->
-    <string name="create_post">CREATE POST</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_post">Create Post</string>
     <string name="upload_image">Upload an image</string>
     <string name="write_caption">WRITE CAPTION</string>
     <string name="write_title">WRITE TITLE</string>

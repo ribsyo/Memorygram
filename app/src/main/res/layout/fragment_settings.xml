@@ -25,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SETTINGS"
+                android:text="@string/settings"
                 android:fontFamily="@font/nunito"
                 android:paddingTop="16dp"
                 android:textStyle="bold"
@@ -57,8 +57,9 @@
             android:layout_width="350dp"
             android:layout_height="50dp"
             android:backgroundTint="@color/sage"
-            android:text="generate one time code"
+            android:text="@string/generate_one_time_code"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@color/white" />
 
@@ -70,8 +71,9 @@
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/sage"
-            android:text="edit profile"
+            android:text="@string/edit_profile"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textSize="14sp"
             android:textColor="@color/white" />
 
@@ -84,8 +86,9 @@
             android:layout_marginTop="8dp"
             android:textSize="14sp"
             android:backgroundTint="@color/sage"
-            android:text="manage family"
+            android:text="@string/manage_family"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
         <!-- Leave Family Button  -->
@@ -97,8 +100,9 @@
             android:layout_marginTop="8dp"
             android:textSize="14sp"
             android:backgroundTint="@color/sage"
-            android:text="leave family"
+            android:text="@string/leave_family"
             android:fontFamily="@font/ptsans"
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
     </LinearLayout>

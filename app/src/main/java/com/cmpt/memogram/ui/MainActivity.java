@@ -9,7 +9,6 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cmpt.memogram.R;
@@ -49,12 +48,12 @@ public class MainActivity extends AppCompatActivity {
                 transaction.commit();
             }
         }
-        // ADDED CODE
+
         MaterialButton viewCollectionBtn = findViewById(R.id.view_collection_btn);
         viewCollectionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openFragment(new CollectionFragment());
+                replaceFragment(new CollectionFragment());
             }
         });
     }
@@ -83,12 +82,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
-    // ADDED CODE
-    private void openFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

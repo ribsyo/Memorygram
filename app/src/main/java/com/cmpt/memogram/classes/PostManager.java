@@ -30,7 +30,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 public class PostManager {
-    private String fg = "testGroup";
+    private String fg = "alexGroup";
     private String userID = "testUser";
     private FirebaseFirestore db;
     private FirebaseStorage fs;
@@ -38,7 +38,7 @@ public class PostManager {
 
     public PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg, String userID) {
         this.db = db;
-        this.fg = fg;
+        this.fg = "alexGroup";
         this.fs = fs;
         this.userID = userID;
         this.sr = this.fs.getReference();

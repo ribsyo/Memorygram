@@ -2,13 +2,22 @@ package com.cmpt.memogram.classes;
 
 import android.util.Log;
 
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,6 +25,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class UserManager {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final StorageReference storageRef = storage.getReference();
+
     Map<String, Object> userDoc = new HashMap<>();
 
     public UserManager() {
@@ -23,8 +35,15 @@ public class UserManager {
             this.getUserDoc(new onGetUserDocListener() {
                 @Override
                 public void onSuccess() {
+                    createGroup("test", new onCreateGroupListener() {
+                        @Override
+                        public void onSuccess() {
+                        }
+                        @Override
+                        public void onFailure() {
+                        }
+                    });
                 }
-
                 @Override
                 public void onFailure(String message) {
                     Log.d("userMan initialize", message);
@@ -60,6 +79,49 @@ public class UserManager {
             return userDoc.get("groupID").toString();
         }
         return null;
+    }
+    public String getRole() {
+        if (userDoc.get("role") != null) {
+            return userDoc.get("role").toString();
+        }
+        return null;
+    }
+
+    public String getEmail() {
+        if (mAuth.getCurrentUser() != null) {
+            return mAuth.getCurrentUser().getEmail();
+        }
+        return null;
+    }
+
+    public String getImagePath() {
+        if (userDoc.get("imagePath") != null) {
+            return userDoc.get("imagePath").toString();
+        }
+        return "";
+    }
+
+
+    public interface onGetProfilePictureListener {
+        void onSuccess(String downloadLink);
+        void onFailure();
+    }
+    public String getProfilePicture(onGetProfilePictureListener listener) {
+        if (userDoc.get("imagePath") != null) {
+            getMedia(userDoc.get("imagePath").toString(), new OnGetFileListener() {
+                @Override
+                public void onSuccess(String downloadLink) {
+                    listener.onSuccess(downloadLink);
+                }
+
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+            });
+
+        }
+        return "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/profilePictures%2FUntitled.jpg?alt=media&token=e97c16d5-86bd-4a86-8498-89148ad8ee0b";
     }
 
     // Logs in with provided credentials returns true on success
@@ -111,7 +173,9 @@ public class UserManager {
                         Log.d("register", "createUserWithEmail:success");
                         Map<String, String> newUser = new HashMap<>();
                         newUser.put("groupID", "");
+                        newUser.put("role", "");
                         newUser.put("name", name);
+                        newUser.put("imagePath", "profilePictures/Untitled.jpg");
 
                         db.collection("Users").document(getID())
                                 .set(newUser, SetOptions.merge());
@@ -129,7 +193,7 @@ public class UserManager {
         void onSuccess();
         void onFailure(String message);
     }
-    private void getUserDoc(onGetUserDocListener listener) {
+    public void getUserDoc(onGetUserDocListener listener) {
         DocumentReference docRef = db.collection("Users")
                 .document(getID());
         docRef.get().addOnCompleteListener(getUser -> {
@@ -138,6 +202,8 @@ public class UserManager {
                 if (document.exists()) {
                     userDoc.put("name", document.getData().get("name"));
                     userDoc.put("groupID", document.getData().get("groupID"));
+                    userDoc.put("role", document.getData().get("role"));
+                    userDoc.put("imagePath", document.getData().get("imagePath"));
                     listener.onSuccess();
                 } else {
                     Log.d("getUser", "No such document");
@@ -155,9 +221,9 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
-    public void joinGroup(String groupJoinCode, onJoinGroupListener listener) {
+    public void joinGroup(String groupJoinCode, String role, onJoinGroupListener listener) {
         DocumentReference docRef = db.collection("Invites")
-                .document(groupJoinCode);
+                .document(groupJoinCode.toUpperCase());
         docRef.get().addOnCompleteListener(getGroup -> {
             if (getGroup.isSuccessful()) {
                 DocumentSnapshot document = getGroup.getResult();
@@ -167,16 +233,19 @@ public class UserManager {
                     // Update user
                     Map<String, Object> userUpdate = new HashMap<>();
                     userUpdate.put("groupID", groupJoinID);
+                    userUpdate.put("role", role);
                     db.collection("Users").document(getID())
                             .set(userUpdate, SetOptions.merge());
                     // Update group
                     Map<String, Object> groupUpdate = new HashMap<>();
                     groupUpdate.put("name", getName());
+                    groupUpdate.put("role", role);
+                    groupUpdate.put("imagePath", userDoc.get("imagePath")).toString();
                     db.collection("FamilyGroups")
                             .document(groupJoinID).collection("Members")
                             .document(getID())
                             .set(groupUpdate, SetOptions.merge());
-                    db.collection("Invites").document(groupJoinCode).delete();
+                    db.collection("Invites").document(groupJoinCode.toUpperCase()).delete();
                     listener.onSuccess();
                 } else {
                     Log.d("joinGroup", "No such invite document");
@@ -208,6 +277,7 @@ public class UserManager {
         // Update user
         Map<String, Object> userUpdate = new HashMap<>();
         userUpdate.put("groupID", "");
+        userUpdate.put("role", "");
         db.collection("Users").document(getID())
                 .set(userUpdate, SetOptions.merge()).addOnCompleteListener(delete -> {
                     if(!delete.isSuccessful()) {
@@ -230,12 +300,14 @@ public class UserManager {
                     String createdGroupID = documentReference.getId();
 
                     // Sets creator as admin and joins
-                    Map<String, String> admin = new HashMap<>();
-                    admin.put("admin", getID());
+                    Map<String, Object> group = new HashMap<>();
+                    group.put("admin", getID());
+                    group.put("name", name);
+                    group.put("tags", Arrays.asList("none"));
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
-                            .set(admin, SetOptions.merge());
-                    joinGroup(createdGroupID, new onJoinGroupListener() {
+                            .set(group, SetOptions.merge());
+                    joinGroup(createdGroupID, userDoc.get("role").toString(), new onJoinGroupListener() {
                         @Override
                         public void onSuccess() {
                             Log.d("createGroup", "Created and joined");
@@ -253,6 +325,60 @@ public class UserManager {
                     Log.w("Create Group", "Error adding document");
                     listener.onFailure();
                 });
+    }
+
+    // Updates group role
+    public interface onUpdateListener {
+        void onSuccess();
+        void onFailure();
+    }
+    public void update(String name, String email, String role, String pw, String imagePath, onUpdateListener listener) {
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(getEmail(), pw);
+        mAuth.getCurrentUser().reauthenticate(credential)
+                .addOnCompleteListener(reAuth -> {
+                    if(!reAuth.isSuccessful()) {
+                        listener.onFailure();
+                    }
+                    Log.d("reAUTH", "User re-authenticated.");
+
+                    // Update group
+                    Map<String, Object> groupUpdate = new HashMap<>();
+                    groupUpdate.put("name", name);
+                    groupUpdate.put("role", role);
+                    groupUpdate.put("imagePath", imagePath);
+                    db.collection("FamilyGroups")
+                            .document(getGroupID()).collection("Members").document(getID())
+                            .set(groupUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if(!update.isSuccessful()) {
+                                    listener.onFailure();
+                                }
+                            });
+
+                    // Update user
+                    Map<String, Object> userUpdate = new HashMap<>();
+                    userUpdate.put("name", name);
+                    userUpdate.put("role", role);
+                    userUpdate.put("imagePath", imagePath);
+                    mAuth.getCurrentUser()
+                            .updateEmail(email)
+                            .addOnCompleteListener(update -> {
+                                if (update.isSuccessful()) {
+                                    Log.d("emailUpdate", "User email address updated.");
+                                } else {
+                                    Log.d("emailUpdate", "User email address update failed. " + update.getException().getMessage());
+                                }
+                            });
+
+                    db.collection("Users").document(getID())
+                            .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if(!update.isSuccessful()) {
+                                    listener.onFailure();
+                                }
+                            });
+                    listener.onSuccess();
+                });
+
     }
 
     // Creates invite code
@@ -302,9 +428,64 @@ public class UserManager {
         Log.d("randomCode", code.toString());
         return code.toString();
     }
-    // TODO: Output members of group
-    // public String[] getGroupMembers() {
-    //   return null;
-    // }
+    public interface onGetGroupMembersListener {
+        void onSuccess(List<User> users);
+        void onFailure();
+    }
+    public void getGroupMembers(onGetGroupMembersListener listener) {
+        CollectionReference membersCollection = db.collection("FamilyGroups")
+                .document(getGroupID())
+                .collection("Members");
+
+        membersCollection.get().addOnCompleteListener(getMembers -> {
+            if (getMembers.isSuccessful()) {
+                List<User> members = new ArrayList<>();
+                for (QueryDocumentSnapshot document : getMembers.getResult()) {
+                    User member = new User();
+                    member.ID = document.getId();
+                    member.name = document.getData().get("name") != null ?
+                            document.getData().get("name").toString() : "NAME BLANK";
+                    member.imagePath = document.getData().get("imagePath").toString();
+                    getMedia(member.imagePath, new OnGetFileListener() {
+                        @Override
+                        public void onSuccess(String downloadLink) {
+                            System.out.println("got image file");
+                            member.imageDownloadLink = downloadLink;
+                            member.role = document.getData().get("role") != null ?
+                                    document.getData().get("role").toString() : "";
+                            members.add(member);
+                            listener.onSuccess(members);
+
+                        }
+                        @Override
+                        public void onFailure() {
+                            // Handle the failure
+                            member.imageDownloadLink = "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/alexGroup%2F6dee7bd8-db42-4e34-970b-305a34b06e17.jpeg?alt=media&token=1a4db593-0523-4ba8-b547-11b62c48f4ca";
+                            member.role = document.getData().get("role") != null ?
+                                    document.getData().get("role").toString() : "";
+                            members.add(member);
+                            listener.onSuccess(members);
+                        }
+                    });
+                }
+
+            } else {
+                Log.d("getGroupMembers", "Error getting documents: ", getMembers.getException());
+                listener.onFailure();
+            }
+        });
+    }
+
+    public void getMedia(String path, final OnGetFileListener listener) {
+        StorageReference fileRef = storageRef.child(path);
+
+        fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            // File download URL retrieved successfully
+            listener.onSuccess(uri.toString());
+        }).addOnFailureListener(exception -> {
+            // Handle any errors
+            listener.onFailure();
+        });
+    }
 
 }

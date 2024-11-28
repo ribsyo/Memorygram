@@ -4,8 +4,8 @@
     android:padding="16dp"
     android:background="@color/yellow"
     android:layout_marginTop="15dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp">
 
     <TextView
         android:id="@+id/tutorial_title"
@@ -14,7 +14,9 @@
         android:text="Welcome to Memogram! Press here to learn the basics."
         android:textSize="14sp"
         android:textColor="@color/black"
-        android:fontFamily="@font/nunito"/>
+        android:fontFamily="@font/nunito"
+        android:drawableRight="@drawable/ic_drop_down"
+        android:drawableTint="@color/black"/>
 
     <TextView
         android:id="@+id/tutorial_description"
