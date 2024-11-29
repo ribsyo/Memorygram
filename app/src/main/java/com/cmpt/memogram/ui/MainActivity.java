@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.classes.AppPreferences;
 import com.cmpt.memogram.classes.UserManager;
 import com.cmpt.memogram.ui.fragment.CollectionFragment;
 import com.cmpt.memogram.ui.fragment.HomeFragment;
@@ -34,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
+
+        // Save the last launch timestamp
+        long currentTimestamp = System.currentTimeMillis() / 1000; // Current time in seconds
+        AppPreferences.saveLastLaunchTimestamp(this, currentTimestamp);
 
         userManager = new UserManager();
         if (userManager.loginStatus()) {

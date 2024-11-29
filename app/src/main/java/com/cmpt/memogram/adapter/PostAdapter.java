@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.cmpt.memogram.R;
+import com.cmpt.memogram.classes.AppPreferences;
 import com.cmpt.memogram.classes.Post;
 import com.cmpt.memogram.classes.User;
 import com.cmpt.memogram.classes.UserManager;
@@ -39,12 +40,14 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private boolean isTutorialExpanded = false;
     private boolean showTutorial;
     private UserManager userManager;
+    private long lastLaunchTimestamp;
 
     public PostAdapter(Context context, List<Post> posts, boolean showTutorial) {
         mContext = context;
         mPosts = posts;
         this.showTutorial = showTutorial;
         this.userManager = new UserManager();
+        this.lastLaunchTimestamp = AppPreferences.getLastLaunchTimestamp(context);
     }
 
     @Override
@@ -77,7 +80,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((TutorialViewHolder) holder).bind();
         } else {
             Post post = mPosts.get(showTutorial ? position - 1 : position);
-            ((PostViewHolder) holder).bind(post);
+            ((PostViewHolder) holder).bind(post, lastLaunchTimestamp);
         }
     }
 
@@ -123,6 +126,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView roleTextView;
         public ImageView profileImageView;
         public TextView tagTextView;
+        public View postContainer;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -136,61 +140,108 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             roleTextView = itemView.findViewById(R.id.role);
             profileImageView = itemView.findViewById(R.id.profile_image);
             tagTextView = itemView.findViewById(R.id.tag);
+            postContainer = itemView.findViewById(R.id.post_container);
         }
 
-        public void bind(Post post) {
-            description.setText(post.text);
-            title.setText(post.title);
-            postDate.setText(getRelativeTime(post.dateListed));
-            tagTextView.setText("#" + post.tag);
+        public void bind(Post post, long lastLaunchTimestamp) {
+            try {
+                System.out.println("PostAdapter: Binding post with ID: " + post.postID);
+                description.setText(post.text);
+                title.setText(post.title);
+                postDate.setText(getRelativeTime(post.datePosted));
+                tagTextView.setText("#" + post.tag);
 
-            String imageUrl = post.imageDownloadLink;
-            String audioUrl = post.audioDownloadLink;
+                String imageUrl = post.imageDownloadLink;
+                String audioUrl = post.audioDownloadLink;
 
-            if (imageUrl == null || imageUrl.isEmpty()) {
-                System.out.println("Error: Image URL is null or empty");
-            } else {
-                Glide.with(mContext).load(imageUrl).into(postImage);
-            }
-
-            postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
-
-            if (playAudio != null) {
-                if (post.includeAudio) {
-                    playAudio.setVisibility(View.VISIBLE);
-                    playAudio.setOnClickListener(v -> playAudio(audioUrl));
+                if (imageUrl == null || imageUrl.isEmpty()) {
+                    System.out.println("Error: Image URL is null or empty");
                 } else {
-                    playAudio.setVisibility(View.GONE);
+                    Glide.with(mContext).load(imageUrl).into(postImage);
                 }
-            }
 
-            editPostBtn.setOnClickListener(v -> {
-                PopupMenu popupMenu = new PopupMenu(mContext, editPostBtn);
-                popupMenu.inflate(R.menu.popup_menu);
-                popupMenu.show();
-            });
+                postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
 
-            // Fetch group members and bind user details
-            userManager.getGroupMembers(new UserManager.onGetGroupMembersListener() {
-                @Override
-                public void onSuccess(List<User> users) {
-                    for (User user : users) {
-                        if (user.ID.equals(post.posterID)) {
-                            nameTextView.setText(user.name);
-                            roleTextView.setText(user.role);
-                            Glide.with(mContext).load(user.imageDownloadLink).into(profileImageView);
-
-                            View.OnClickListener userClickListener = v -> openCollectionHomeFragment(user.name);
-                            break;
-                        }
+                if (playAudio != null) {
+                    if (post.includeAudio) {
+                        playAudio.setVisibility(View.VISIBLE);
+                        playAudio.setOnClickListener(v -> playAudio(audioUrl));
+                    } else {
+                        playAudio.setVisibility(View.GONE);
                     }
                 }
 
-                @Override
-                public void onFailure() {
-                    Log.e("PostAdapter", "Failed to fetch group members");
+                editPostBtn.setOnClickListener(v -> {
+                    PopupMenu popupMenu = new PopupMenu(mContext, editPostBtn);
+                    popupMenu.inflate(R.menu.popup_menu);
+                    popupMenu.show();
+                });
+
+                userManager.getGroupMembers(new UserManager.onGetGroupMembersListener() {
+                    @Override
+                    public void onSuccess(List<User> users) {
+                        for (User user : users) {
+                            if (user.ID.equals(post.posterID)) {
+                                nameTextView.setText(user.name);
+                                roleTextView.setText(user.role);
+                                Glide.with(mContext).load(user.imageDownloadLink).into(profileImageView);
+
+                                View.OnClickListener userClickListener = v -> openCollectionHomeFragment(user.name);
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        System.out.println("PostAdapter: Failed to fetch group members");
+                    }
+                });
+
+                // Highlight new posts
+                if (post.datePosted != null && !post.datePosted.isEmpty()) {
+                    try {
+                        long postTimestamp;
+                        if (post.datePosted.contains("Timestamp")) {
+                            String[] parts = post.datePosted.split("[=,)]");
+                            long seconds = Long.parseLong(parts[1].trim());
+                            postTimestamp = seconds * 1000;
+                        } else {
+                            postTimestamp = Long.parseLong(post.datePosted);
+                        }
+                        System.out.println("PostAdapter: Parsed postTimestamp: " + postTimestamp);
+                        System.out.println("PostAdapter: Last launch timestamp: " + lastLaunchTimestamp * 1000);
+
+                        if (AppPreferences.isPostViewed(mContext, post.postID)) {
+                            System.out.println("PostAdapter: Post has been viewed before");
+                            postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
+                        } else if (postTimestamp > lastLaunchTimestamp * 1000) {
+                            System.out.println("PostAdapter: Highlighting new post");
+                            postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color));
+                        } else {
+                            System.out.println("PostAdapter: Post is not new");
+                            postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
+                        }
+                    } catch (Exception e) {
+                        System.out.println("PostAdapter: Exception while parsing datePosted: " + e.getMessage());
+                        postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
+                    }
+                } else {
+                    System.out.println("PostAdapter: post.datePosted is null or empty");
+                    postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
                 }
-            });
+
+                postContainer.setOnClickListener(v -> {
+                    System.out.println("PostAdapter: Post clicked, marking as viewed");
+                    postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
+                    // Save the state that the post has been viewed
+                    AppPreferences.setPostViewed(mContext, post.postID);
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("PostAdapter: Exception: " + e.getMessage());
+            }
         }
 
         private void openCollectionHomeFragment(String userName) {
