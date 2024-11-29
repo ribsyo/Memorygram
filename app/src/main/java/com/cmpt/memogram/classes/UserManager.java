@@ -99,7 +99,7 @@ public class UserManager {
         void onSuccess(String downloadLink);
         void onFailure();
     }
-    public String getProfilePicture(onGetProfilePictureListener listener) {
+    public void getProfilePicture(onGetProfilePictureListener listener) {
         if (userDoc.get("imagePath") != null) {
             getMedia(userDoc.get("imagePath").toString(), new OnGetFileListener() {
                 @Override
@@ -109,12 +109,12 @@ public class UserManager {
 
                 @Override
                 public void onFailure() {
-                    listener.onFailure();
+                    listener.onSuccess("https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/profilePictures%2FUntitled.jpg?alt=media&token=e97c16d5-86bd-4a86-8498-89148ad8ee0b");
                 }
             });
 
         }
-        return "https://firebasestorage.googleapis.com/v0/b/memorygram-1b8ca.appspot.com/o/profilePictures%2FUntitled.jpg?alt=media&token=e97c16d5-86bd-4a86-8498-89148ad8ee0b";
+
     }
 
     // Logs in with provided credentials returns true on success
