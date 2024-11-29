@@ -71,13 +71,13 @@ public class CollectionHomeFragment extends Fragment {
             String filterValue = args.getString("filterValue");
             String tagName = args.getString("tagName");
 
-            // Set the title according to the tag name
-            TextView titleTextView = view.findViewById(R.id.collection_home_title);
-            titleTextView.setText(tagName);
-
+            // Set the sorting information
+            TextView sortingInfoTextView = view.findViewById(R.id.collection_home_title);
             if ("tag".equals(filterType)) {
+                sortingInfoTextView.setText("SORTED BY TAG");
                 filterPostsByTag(filterValue);
             } else if ("user".equals(filterType)) {
+                sortingInfoTextView.setText("SORTED BY USER");
                 filterPostsByUserName(filterValue);
             }
         }

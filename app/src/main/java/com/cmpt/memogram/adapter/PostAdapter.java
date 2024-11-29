@@ -33,6 +33,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_TUTORIAL = 0;
     private static final int VIEW_TYPE_POST = 1;
+    private static final int VIEW_TYPE_POST_NO_AUDIO = 2;
     private final Context mContext;
     private final List<Post> mPosts;
     private boolean isTutorialExpanded = false;
@@ -51,16 +52,19 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (showTutorial && position == 0) {
             return VIEW_TYPE_TUTORIAL;
         } else {
-            return VIEW_TYPE_POST;
+            Post post = mPosts.get(showTutorial ? position - 1 : position);
+            return post.includeAudio ? VIEW_TYPE_POST : VIEW_TYPE_POST_NO_AUDIO;
         }
     }
 
-    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_TUTORIAL) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.tutorial_post_item, parent, false);
             return new TutorialViewHolder(view);
+        } else if (viewType == VIEW_TYPE_POST_NO_AUDIO) {
+            View view = LayoutInflater.from(mContext).inflate(R.layout.post_item_no_audio, parent, false);
+            return new PostViewHolder(view);
         } else {
             View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
             return new PostViewHolder(view);
@@ -118,6 +122,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public TextView nameTextView;
         public TextView roleTextView;
         public ImageView profileImageView;
+        public TextView tagTextView;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -130,12 +135,14 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             nameTextView = itemView.findViewById(R.id.poster);
             roleTextView = itemView.findViewById(R.id.role);
             profileImageView = itemView.findViewById(R.id.profile_image);
+            tagTextView = itemView.findViewById(R.id.tag);
         }
 
         public void bind(Post post) {
             description.setText(post.text);
             title.setText(post.title);
             postDate.setText(getRelativeTime(post.dateListed));
+            tagTextView.setText("#" + post.tag);
 
             String imageUrl = post.imageDownloadLink;
             String audioUrl = post.audioDownloadLink;
@@ -143,14 +150,19 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (imageUrl == null || imageUrl.isEmpty()) {
                 System.out.println("Error: Image URL is null or empty");
             } else {
-                Glide.with(mContext)
-                        .load(imageUrl)
-                        .into(postImage);
+                Glide.with(mContext).load(imageUrl).into(postImage);
             }
 
             postImage.setOnClickListener(v -> showFullScreenImage(imageUrl));
 
-            playAudio.setOnClickListener(v -> playAudio(audioUrl));
+            if (playAudio != null) {
+                if (post.includeAudio) {
+                    playAudio.setVisibility(View.VISIBLE);
+                    playAudio.setOnClickListener(v -> playAudio(audioUrl));
+                } else {
+                    playAudio.setVisibility(View.GONE);
+                }
+            }
 
             editPostBtn.setOnClickListener(v -> {
                 PopupMenu popupMenu = new PopupMenu(mContext, editPostBtn);
@@ -169,8 +181,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             Glide.with(mContext).load(user.imageDownloadLink).into(profileImageView);
 
                             View.OnClickListener userClickListener = v -> openCollectionHomeFragment(user.name);
-                            nameTextView.setOnClickListener(userClickListener);
-                            profileImageView.setOnClickListener(userClickListener);
                             break;
                         }
                     }

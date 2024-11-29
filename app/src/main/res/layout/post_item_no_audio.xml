@@ -139,18 +139,6 @@
                         android:textAllCaps="true"/>
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/play_audio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/blue"
-                    android:drawableLeft="@drawable/ic_play_audio"
-                    android:drawableTint="@color/yellow"
-                    android:fontFamily="@font/ptsans"
-                    android:gravity="center"
-                    android:paddingHorizontal="20dp"
-                    android:text="@string/play_audio"
-                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView

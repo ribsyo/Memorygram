@@ -77,7 +77,6 @@ public class CollectionFragment extends Fragment {
 
             @Override
             public void onFailure() {
-                // Handle the error
             }
         });
     }
