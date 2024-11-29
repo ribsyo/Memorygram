@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.cmpt.memogram.classes.OnUploadPostListener;
 import com.cmpt.memogram.classes.PostManager;
+import com.cmpt.memogram.classes.UserManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import java.io.ByteArrayOutputStream;
@@ -158,8 +159,8 @@ public class PostFragment extends Fragment {
 
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     FirebaseStorage fs = FirebaseStorage.getInstance();
-                    PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
-
+                    UserManager userManager = new UserManager();
+                    PostManager postManager = new PostManager(db, fs, "alexGroup", userManager.getID());
                     OnUploadPostListener uploadListener = new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {

@@ -22,6 +22,8 @@ import com.cmpt.memogram.classes.UserManager;
 import com.cmpt.memogram.classes.OnGetPostNamesListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+
+import java.util.Collections;
 import java.util.List;
 
 public class CollectionFragment extends Fragment {
@@ -67,6 +69,8 @@ public class CollectionFragment extends Fragment {
         userManager.getGroupMembers(new UserManager.onGetGroupMembersListener() {
             @Override
             public void onSuccess(List<User> users) {
+                // Sort users by name in alphabetical order
+                Collections.sort(users, (user1, user2) -> user1.name.compareToIgnoreCase(user2.name));
                 userAdapter = new UserAdapter(users, CollectionFragment.this);
                 recyclerView.setAdapter(userAdapter);
             }

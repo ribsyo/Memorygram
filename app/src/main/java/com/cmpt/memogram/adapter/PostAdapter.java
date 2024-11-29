@@ -135,7 +135,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void bind(Post post) {
             description.setText(post.text);
             title.setText(post.title);
-            postDate.setText(getRelativeTime(post.dateListed)); // Use dateListed instead of datePosted
+            postDate.setText(getRelativeTime(post.dateListed));
 
             String imageUrl = post.imageDownloadLink;
             String audioUrl = post.audioDownloadLink;
@@ -164,17 +164,13 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onSuccess(List<User> users) {
                     for (User user : users) {
                         if (user.ID.equals(post.posterID)) {
-                            System.out.println("PosterID: " + post.posterID);
-                            System.out.println("User Name: " + user.name);
                             nameTextView.setText(user.name);
                             roleTextView.setText(user.role);
                             Glide.with(mContext).load(user.imageDownloadLink).into(profileImageView);
 
-                            // Set OnClickListener to open CollectionHomeFragment
                             View.OnClickListener userClickListener = v -> openCollectionHomeFragment(user.name);
                             nameTextView.setOnClickListener(userClickListener);
                             profileImageView.setOnClickListener(userClickListener);
-
                             break;
                         }
                     }

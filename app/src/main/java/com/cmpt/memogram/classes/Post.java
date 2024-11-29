@@ -12,4 +12,5 @@ public class Post {
     public String posterID;
     public String tag;
     public boolean includeAudio;
+    public String postID;
 }

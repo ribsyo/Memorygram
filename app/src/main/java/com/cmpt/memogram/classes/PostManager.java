@@ -31,7 +31,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class PostManager {
     private String fg = "alexGroup";
-    private String userID = "testUser";
+    private String userID = "";
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private StorageReference sr;
