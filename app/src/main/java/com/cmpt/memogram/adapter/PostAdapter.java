@@ -24,6 +24,8 @@ import com.cmpt.memogram.classes.Post;
 import com.cmpt.memogram.classes.PostManager;
 import com.cmpt.memogram.classes.User;
 import com.cmpt.memogram.classes.UserManager;
+import com.cmpt.memogram.ui.MainActivity;
+import com.cmpt.memogram.ui.fragment.HomeFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -187,6 +189,13 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                     @Override
                                     public void onSuccess() {
                                         Toast.makeText(mContext, "Post deleted successfully", Toast.LENGTH_SHORT).show();
+                                        // Call refreshPosts() method from HomeFragment
+                                        if (mContext instanceof MainActivity) {
+                                            HomeFragment homeFragment = (HomeFragment) ((MainActivity) mContext).getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                                            if (homeFragment != null) {
+                                                homeFragment.refreshPosts();
+                                            }
+                                        }
                                     }
 
                                     @Override
