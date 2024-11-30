@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,7 @@ public class EditProfileFragment extends Fragment {
         pwEdit = view.findViewById(R.id.password);
         AutoCompleteTextView roleDropdown = view.findViewById(R.id.role);
         saveButton = view.findViewById(R.id.save_btn);
+
         UserManager um = new UserManager();
         um.getUserDoc(new UserManager.onGetUserDocListener() {
             @Override
@@ -82,7 +84,7 @@ public class EditProfileFragment extends Fragment {
             }
             @Override
             public void onFailure(String message) {
-
+                Log.d("editProfile", message);
             }
         });
 
@@ -118,68 +120,73 @@ public class EditProfileFragment extends Fragment {
                         Toast.makeText(getContext(), "Enter a password please", Toast.LENGTH_SHORT).show();
                         return;
                     };
+
                     saveButton.setEnabled(false);
 
                     String name = nameEdit.getText().toString();
                     String email = emailEdit.getText().toString();
                     String role = roleDropdown.getText().toString();
                     String pw = pwEdit.getText().toString();
-                    prepareImageBytes();
-
-
-                    Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
                     String imPath = "profilePictures/" + um.getID().toString() + ".jpeg";
-                    // Upload image file
-                    StorageReference imageRef = FirebaseStorage
-                            .getInstance()
-                            .getReference()
-                            .child(imPath);
-
-
-                    StorageMetadata imageMetadata = new StorageMetadata.Builder()
-                        .setContentType("image/jpeg")
-                        .build();
-
-                    try {
-                        InputStream inputStream = getContext().getContentResolver().openInputStream(selectedImageUri);
-                        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-                        int bufferSize = 1024;
-                        byte[] buffer = new byte[bufferSize];
-                        int len;
-                        while ((len = inputStream.read(buffer)) != -1) {
-                            byteBuffer.write(buffer, 0, len);
-                        }
-                        imageBytes = byteBuffer.toByteArray();
-
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(getContext(), "Error preparing image", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
+                    if(selectedImageUri != null) {
+                        prepareImageBytes();
+                        uploadImage(um);
                     }
 
-                    imageRef.putBytes(imageBytes, imageMetadata)
-                            .addOnSuccessListener(imageTaskSnapshot -> {
-                                imageRef.getDownloadUrl().addOnSuccessListener(imageUri -> {
-                                    um.update(name, email, role, pw, imPath, new UserManager.onUpdateListener() {
-                                        @Override
-                                        public void onSuccess() {
-                                            Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
-                                            getParentFragmentManager().popBackStack();
-                                        }
-                                        @Override
-                                        public void onFailure() {
-                                            saveButton.setEnabled(true);
-                                            Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                });
-                        });
+                    um.update(name, email, role, pw, imPath, new UserManager.onUpdateListener() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
+                            getParentFragmentManager().popBackStack();
+                        }
+                        @Override
+                        public void onFailure() {
+                            saveButton.setEnabled(true);
+                            Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
 
             }
         });
         return view;
+    }
+
+    private void uploadImage(UserManager um) {
+        String imPath = "profilePictures/" + um.getID().toString() + ".jpeg";
+        // Upload image file
+        StorageReference imageRef = FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(imPath);
+
+
+        StorageMetadata imageMetadata = new StorageMetadata.Builder()
+                .setContentType("image/jpeg")
+                .build();
+
+        try {
+            InputStream inputStream = getContext().getContentResolver().openInputStream(selectedImageUri);
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+            imageBytes = byteBuffer.toByteArray();
+
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Error preparing image", Toast.LENGTH_SHORT).show();
+        }
+        imageRef.putBytes(imageBytes, imageMetadata)
+                .addOnSuccessListener(imageTaskSnapshot -> {
+                    imageRef.getDownloadUrl();
+                });
     }
 
     private void openGallery() {
