@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -20,10 +21,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.AppPreferences;
+import com.cmpt.memogram.classes.OnDeletePostListener;
 import com.cmpt.memogram.classes.Post;
+import com.cmpt.memogram.classes.PostManager;
 import com.cmpt.memogram.classes.User;
 import com.cmpt.memogram.classes.UserManager;
 import com.cmpt.memogram.ui.fragment.CollectionHomeFragment;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +61,11 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return VIEW_TYPE_TUTORIAL;
         } else {
             Post post = mPosts.get(showTutorial ? position - 1 : position);
-            return post.includeAudio ? VIEW_TYPE_POST : VIEW_TYPE_POST_NO_AUDIO;
+            if (post != null) {
+                return post.includeAudio ? VIEW_TYPE_POST : VIEW_TYPE_POST_NO_AUDIO;
+            } else {
+                return VIEW_TYPE_POST_NO_AUDIO;
+            }
         }
     }
 
@@ -127,6 +136,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public ImageView profileImageView;
         public TextView tagTextView;
         public View postContainer;
+        private PostManager postManager;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -141,6 +151,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             profileImageView = itemView.findViewById(R.id.profile_image);
             tagTextView = itemView.findViewById(R.id.tag);
             postContainer = itemView.findViewById(R.id.post_container);
+            postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), "alexGroup", userManager.getID());
         }
 
         public void bind(Post post, long lastLaunchTimestamp) {
@@ -148,7 +159,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 System.out.println("PostAdapter: Binding post with ID: " + post.postID);
                 description.setText(post.text);
                 title.setText(post.title);
-                postDate.setText(getRelativeTime(post.datePosted));
+                postDate.setText(getRelativeTime(post.dateListed));
                 tagTextView.setText("#" + post.tag);
 
                 String imageUrl = post.imageDownloadLink;
@@ -171,11 +182,34 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 }
 
-                editPostBtn.setOnClickListener(v -> {
-                    PopupMenu popupMenu = new PopupMenu(mContext, editPostBtn);
-                    popupMenu.inflate(R.menu.popup_menu);
-                    popupMenu.show();
-                });
+                System.out.println("PostViewHolder: postID: " + post.postID);
+                if (post.posterID.equals(userManager.getID())) {
+                    editPostBtn.setVisibility(View.VISIBLE);
+                    editPostBtn.setOnClickListener(v -> {
+                        PopupMenu popupMenu = new PopupMenu(mContext, editPostBtn);
+                        popupMenu.inflate(R.menu.popup_menu);
+                        popupMenu.setOnMenuItemClickListener(item -> {
+                            if (item.getItemId() == R.id.delete) {
+                                postManager.deletePost(post.postID, new OnDeletePostListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Toast.makeText(mContext, "Post deleted successfully", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        Toast.makeText(mContext, "Failed to delete post", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return true;
+                            }
+                            return false;
+                        });
+                        popupMenu.show();
+                    });
+                } else {
+                    editPostBtn.setVisibility(View.GONE);
+                }
 
                 userManager.getGroupMembers(new UserManager.onGetGroupMembersListener() {
                     @Override
@@ -198,7 +232,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
 
-                // Highlight new posts
+                // Highlight new posts based solely on timestamps
                 if (post.datePosted != null && !post.datePosted.isEmpty()) {
                     try {
                         long postTimestamp;
@@ -212,10 +246,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         System.out.println("PostAdapter: Parsed postTimestamp: " + postTimestamp);
                         System.out.println("PostAdapter: Last launch timestamp: " + lastLaunchTimestamp * 1000);
 
-                        if (AppPreferences.isPostViewed(mContext, post.postID)) {
-                            System.out.println("PostAdapter: Post has been viewed before");
-                            postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
-                        } else if (postTimestamp > lastLaunchTimestamp * 1000) {
+                        if (postTimestamp > lastLaunchTimestamp * 1000) {
                             System.out.println("PostAdapter: Highlighting new post");
                             postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color));
                         } else {
@@ -230,13 +261,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     System.out.println("PostAdapter: post.datePosted is null or empty");
                     postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
                 }
-
-                postContainer.setOnClickListener(v -> {
-                    System.out.println("PostAdapter: Post clicked, marking as viewed");
-                    postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
-                    // Save the state that the post has been viewed
-                    AppPreferences.setPostViewed(mContext, post.postID);
-                });
 
             } catch (Exception e) {
                 e.printStackTrace();

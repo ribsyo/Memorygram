@@ -57,7 +57,7 @@ public class PostManager {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         post = toPost(document);
-
+                        post.postID = document.getId();
                         Post finalPost = post;
                         //get image
                         getMedia(finalPost.imagePath, new OnGetFileListener() {
@@ -379,7 +379,36 @@ public class PostManager {
 
 
     }
+    private void checkAndRemoveTag(String tag, final OnDeletePostListener listener) {
+        CollectionReference postsRef = FirebaseFirestore.getInstance().collection("FamilyGroups").document(this.fg).collection("Posts");
 
+        postsRef.whereEqualTo("tag", tag).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    if (task.getResult().isEmpty()) {
+                        // No posts with the same tag, remove the tag from FamilyGroup
+                        DocumentReference familyGroupRef = FirebaseFirestore.getInstance().collection("FamilyGroups").document(fg);
+                        familyGroupRef.update("tags", FieldValue.arrayRemove(tag))
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> removeTagTask) {
+                                        if (removeTagTask.isSuccessful()) {
+                                            listener.onSuccess();
+                                        } else {
+                                            listener.onFailure(removeTagTask.getException());
+                                        }
+                                    }
+                                });
+                    } else {
+                        listener.onSuccess();
+                    }
+                } else {
+                    listener.onFailure(task.getException());
+                }
+            }
+        });
+    }
 
     //deletes Post from database
     public void deletePost(String postName, final OnDeletePostListener listener) {
@@ -393,6 +422,8 @@ public class PostManager {
                     DocumentSnapshot document = task.getResult();
                     String imagePath = document.getString("imagePath");
                     String audioPath = document.getString("audioPath");
+                    String tag = document.getString("tag");
+                    boolean includeAudio = document.getBoolean("includeAudio");
 
                     // Delete image file
                     StorageReference imageRef = FirebaseStorage.getInstance().getReference().child(imagePath);
@@ -400,28 +431,42 @@ public class PostManager {
                         @Override
                         public void onComplete(@NonNull Task<Void> imageTask) {
                             if (imageTask.isSuccessful()) {
-                                // Delete audio file
-                                StorageReference audioRef = FirebaseStorage.getInstance().getReference().child(audioPath);
-                                audioRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> audioTask) {
-                                        if (audioTask.isSuccessful()) {
-                                            // Delete post document
-                                            postsRef.document(postName).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> deleteTask) {
-                                                    if (deleteTask.isSuccessful()) {
-                                                        listener.onSuccess();
-                                                    } else {
-                                                        listener.onFailure(deleteTask.getException());
+                                if (includeAudio) {
+                                    // Delete audio file
+                                    StorageReference audioRef = FirebaseStorage.getInstance().getReference().child(audioPath);
+                                    audioRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> audioTask) {
+                                            if (audioTask.isSuccessful()) {
+                                                // Delete post document
+                                                postsRef.document(postName).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> deleteTask) {
+                                                        if (deleteTask.isSuccessful()) {
+                                                            checkAndRemoveTag(tag, listener);
+                                                        } else {
+                                                            listener.onFailure(deleteTask.getException());
+                                                        }
                                                     }
-                                                }
-                                            });
-                                        } else {
-                                            listener.onFailure(audioTask.getException());
+                                                });
+                                            } else {
+                                                listener.onFailure(audioTask.getException());
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                } else {
+                                    // Delete post document if no audio file
+                                    postsRef.document(postName).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> deleteTask) {
+                                            if (deleteTask.isSuccessful()) {
+                                                checkAndRemoveTag(tag, listener);
+                                            } else {
+                                                listener.onFailure(deleteTask.getException());
+                                            }
+                                        }
+                                    });
+                                }
                             } else {
                                 listener.onFailure(imageTask.getException());
                             }
