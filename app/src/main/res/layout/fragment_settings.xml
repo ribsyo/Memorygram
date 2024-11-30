@@ -84,6 +84,20 @@
                         android:backgroundTint="@color/dark_green"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
+                    <EditText
+                        android:id="@+id/one_time_code_input"
+                        android:layout_width="350dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:hint="Enter One-Time Code"
+                        android:background="@drawable/rounded_edittext"
+                        android:padding="12dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:layout_marginTop="5dp"
+                        android:visibility="gone" />
+
+
                     <Button
                         android:id="@+id/generate_one_time_code_btn"
                         android:layout_width="match_parent"
@@ -92,6 +106,16 @@
                         android:textColor="@color/white"
                         android:backgroundTint="@color/dark_green"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <TextView
+                        android:id="@+id/one_time_code_display"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
