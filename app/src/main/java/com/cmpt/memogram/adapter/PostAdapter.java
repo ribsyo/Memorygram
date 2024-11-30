@@ -3,7 +3,6 @@ package com.cmpt.memogram.adapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -26,17 +24,15 @@ import com.cmpt.memogram.classes.Post;
 import com.cmpt.memogram.classes.PostManager;
 import com.cmpt.memogram.classes.User;
 import com.cmpt.memogram.classes.UserManager;
-import com.cmpt.memogram.ui.fragment.CollectionHomeFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
     private static final int VIEW_TYPE_TUTORIAL = 0;
     private static final int VIEW_TYPE_POST = 1;
     private static final int VIEW_TYPE_POST_NO_AUDIO = 2;
@@ -46,6 +42,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private boolean showTutorial;
     private UserManager userManager;
     private long lastLaunchTimestamp;
+    private long currentSessionTimestamp;
 
     public PostAdapter(Context context, List<Post> posts, boolean showTutorial) {
         mContext = context;
@@ -53,6 +50,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.showTutorial = showTutorial;
         this.userManager = new UserManager();
         this.lastLaunchTimestamp = AppPreferences.getLastLaunchTimestamp(context);
+        this.currentSessionTimestamp = System.currentTimeMillis();
     }
 
     @Override
@@ -89,7 +87,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((TutorialViewHolder) holder).bind();
         } else {
             Post post = mPosts.get(showTutorial ? position - 1 : position);
-            ((PostViewHolder) holder).bind(post, lastLaunchTimestamp);
+            ((PostViewHolder) holder).bind(post, lastLaunchTimestamp, currentSessionTimestamp);
         }
     }
 
@@ -124,7 +122,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     class PostViewHolder extends RecyclerView.ViewHolder {
-
         public TextView description;
         public TextView title;
         public ImageView postImage;
@@ -154,9 +151,8 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), "alexGroup", userManager.getID());
         }
 
-        public void bind(Post post, long lastLaunchTimestamp) {
+        private void bind(Post post, long lastLaunchTimestamp, long currentSessionTimestamp) {
             try {
-                System.out.println("PostAdapter: Binding post with ID: " + post.postID);
                 description.setText(post.text);
                 title.setText(post.title);
                 postDate.setText(getRelativeTime(post.dateListed));
@@ -165,9 +161,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 String imageUrl = post.imageDownloadLink;
                 String audioUrl = post.audioDownloadLink;
 
-                if (imageUrl == null || imageUrl.isEmpty()) {
-                    System.out.println("Error: Image URL is null or empty");
-                } else {
+                if (imageUrl != null && !imageUrl.isEmpty()) {
                     Glide.with(mContext).load(imageUrl).into(postImage);
                 }
 
@@ -182,7 +176,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 }
 
-                System.out.println("PostViewHolder: postID: " + post.postID);
                 if (post.posterID.equals(userManager.getID())) {
                     editPostBtn.setVisibility(View.VISIBLE);
                     editPostBtn.setOnClickListener(v -> {
@@ -219,8 +212,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                 nameTextView.setText(user.name);
                                 roleTextView.setText(user.role);
                                 Glide.with(mContext).load(user.imageDownloadLink).into(profileImageView);
-
-                                View.OnClickListener userClickListener = v -> openCollectionHomeFragment(user.name);
                                 break;
                             }
                         }
@@ -232,35 +223,31 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
 
-                // Highlight new posts based solely on timestamps
-                if (post.datePosted != null && !post.datePosted.isEmpty()) {
-                    try {
-                        long postTimestamp;
-                        if (post.datePosted.contains("Timestamp")) {
-                            String[] parts = post.datePosted.split("[=,)]");
-                            long seconds = Long.parseLong(parts[1].trim());
-                            postTimestamp = seconds * 1000;
-                        } else {
-                            postTimestamp = Long.parseLong(post.datePosted);
-                        }
-                        System.out.println("PostAdapter: Parsed postTimestamp: " + postTimestamp);
-                        System.out.println("PostAdapter: Last launch timestamp: " + lastLaunchTimestamp * 1000);
+                // Convert timestamps to milliseconds
+                long lastLaunchTimestampMillis = lastLaunchTimestamp * 1000;
+                long currentSessionTimestampMillis = currentSessionTimestamp * 1000;
 
-                        if (postTimestamp > lastLaunchTimestamp * 1000) {
-                            System.out.println("PostAdapter: Highlighting new post");
-                            postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color));
-                        } else {
-                            System.out.println("PostAdapter: Post is not new");
-                            postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
-                        }
-                    } catch (Exception e) {
-                        System.out.println("PostAdapter: Exception while parsing datePosted: " + e.getMessage());
-                        postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
-                    }
+                // Highlight new posts based on timestamps and if not viewed
+                long postTimestamp = getPostTimestamp(post.datePosted);
+                System.out.println("PostAdapter: Post timestamp: " + postTimestamp);
+                System.out.println("PostAdapter: Last launch timestamp: " + lastLaunchTimestampMillis);
+
+                if (postTimestamp > lastLaunchTimestampMillis && !AppPreferences.isPostViewed(mContext, post.postID)) {
+                    postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color));
+                    System.out.println("PostAdapter: Post " + post.postID + " is new.");
                 } else {
-                    System.out.println("PostAdapter: post.datePosted is null or empty");
                     postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
+                    System.out.println("PostAdapter: Post " + post.postID + " is not new.");
                 }
+
+                // Remove highlight on click
+                postContainer.setOnClickListener(v -> {
+                    postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
+                    AppPreferences.setPostViewed(mContext, post.postID);
+                });
+
+                // Print viewed posts
+                AppPreferences.printViewedPosts(mContext);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -268,79 +255,77 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
 
-        private void openCollectionHomeFragment(String userName) {
-            CollectionHomeFragment fragment = CollectionHomeFragment.newInstance(userName);
-            ((FragmentActivity) mContext).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
+        private void showFullScreenImage(String imageUrl) {
+            Dialog dialog = new Dialog(mContext, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+            dialog.setContentView(R.layout.dialog_fullscreen_image);
+            ImageView fullscreenImage = dialog.findViewById(R.id.fullscreen_image);
+            ImageButton closeButton = dialog.findViewById(R.id.close_button);
+
+            Glide.with(mContext).load(imageUrl).into(fullscreenImage);
+
+            closeButton.setOnClickListener(v -> dialog.dismiss());
+
+            dialog.show();
         }
-    }
 
-    private void showFullScreenImage(String imageUrl) {
-        Dialog dialog = new Dialog(mContext, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        dialog.setContentView(R.layout.dialog_fullscreen_image);
-        ImageView fullscreenImage = dialog.findViewById(R.id.fullscreen_image);
-        ImageButton closeButton = dialog.findViewById(R.id.close_button);
-
-        Glide.with(mContext).load(imageUrl).into(fullscreenImage);
-
-        closeButton.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-    }
-
-    private void playAudio(String audioUrl) {
-        try {
-            MediaPlayer mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(audioUrl);
-            mediaPlayer.setOnPreparedListener(MediaPlayer::start);
-            mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-            mediaPlayer.prepareAsync();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error playing audio: " + e.getMessage());
+        private void playAudio(String audioUrl) {
+            try {
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                mediaPlayer.setDataSource(audioUrl);
+                mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+                mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+                mediaPlayer.prepareAsync();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Error playing audio: " + e.getMessage());
+            }
         }
-    }
 
-    public String getRelativeTime(String datePosted) {
-        try {
-            long postTime;
-            if (datePosted.contains("Timestamp")) {
-                String[] parts = datePosted.split("[=,)]");
-                long seconds = Long.parseLong(parts[1].trim());
-                postTime = seconds * 1000;
-            } else {
-                postTime = Long.parseLong(datePosted);
+        private long getPostTimestamp(String datePosted) {
+            try {
+                if (datePosted.contains("Timestamp")) {
+                    String[] parts = datePosted.split("[=,)]");
+                    long seconds = Long.parseLong(parts[1].trim());
+                    return seconds * 1000;
+                } else {
+                    return Long.parseLong(datePosted);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
             }
+        }
 
-            long currentTime = System.currentTimeMillis();
-            long diff = currentTime - postTime;
+        public String getRelativeTime(String datePosted) {
+            try {
+                long postTime = getPostTimestamp(datePosted);
+                long currentTime = System.currentTimeMillis();
+                long diff = currentTime - postTime;
 
-            long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-            long hours = TimeUnit.MILLISECONDS.toHours(diff);
-            long days = TimeUnit.MILLISECONDS.toDays(diff);
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+                long hours = TimeUnit.MILLISECONDS.toHours(diff);
+                long days = TimeUnit.MILLISECONDS.toDays(diff);
 
-            if (seconds < 60) {
-                return "just now";
-            } else if (minutes == 1) {
-                return "a minute ago";
-            } else if (minutes > 1 && minutes < 60) {
-                return minutes + " minutes ago";
-            } else if (hours == 1) {
-                return "an hour ago";
-            } else if (hours > 1 && hours < 24) {
-                return hours + " hours ago";
-            } else {
-                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-                Date date = new Date(postTime);
-                return sdf.format(date);
+                if (seconds < 60) {
+                    return "just now";
+                } else if (minutes == 1) {
+                    return "a minute ago";
+                } else if (minutes > 1 && minutes < 60) {
+                    return minutes + " minutes ago";
+                } else if (hours == 1) {
+                    return "an hour ago";
+                } else if (hours > 1 && hours < 24) {
+                    return hours + " hours ago";
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                    Date date = new Date(postTime);
+                    return sdf.format(date);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "unknown time";
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "unknown time";
         }
     }
 }
