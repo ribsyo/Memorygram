@@ -2,6 +2,7 @@ package com.cmpt.memogram.classes;
 
 public class Post {
     public String title;
+    public String postID;
     public String text;
     public String audioPath;
     public String audioDownloadLink;
