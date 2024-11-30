@@ -232,21 +232,11 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
 
-                // Convert timestamps to milliseconds
-                long lastLaunchTimestampMillis = lastLaunchTimestamp * 1000;
-                long currentSessionTimestampMillis = currentSessionTimestamp * 1000;
-
-                // Highlight new posts based on timestamps and if not viewed
-                long postTimestamp = getPostTimestamp(post.datePosted);
-                System.out.println("PostAdapter: Post timestamp: " + postTimestamp);
-                System.out.println("PostAdapter: Last launch timestamp: " + lastLaunchTimestampMillis);
-
-                if (postTimestamp > lastLaunchTimestampMillis && !AppPreferences.isPostViewed(mContext, post.postID)) {
+                // Highlight new posts based on viewed state
+                if (!AppPreferences.isPostViewed(mContext, post.postID)) {
                     postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.highlight_color));
-                    System.out.println("PostAdapter: Post " + post.postID + " is new.");
                 } else {
                     postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
-                    System.out.println("PostAdapter: Post " + post.postID + " is not new.");
                 }
 
                 // Remove highlight on click
@@ -254,9 +244,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     postContainer.setBackgroundColor(mContext.getResources().getColor(R.color.default_color));
                     AppPreferences.setPostViewed(mContext, post.postID);
                 });
-
-                // Print viewed posts
-                AppPreferences.printViewedPosts(mContext);
 
             } catch (Exception e) {
                 e.printStackTrace();
