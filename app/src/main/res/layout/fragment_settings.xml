@@ -9,7 +9,6 @@
     android:background="@color/dark_green"
     android:layout_marginTop="65dp">
 
-
     <!-- Simplified Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
@@ -39,7 +38,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
-
 
     <!-- Scrollable Content Container -->
     <ScrollView
@@ -91,7 +89,6 @@
                         android:textColorHint="@color/grey"
                         android:layout_marginTop="5dp"
                         android:visibility="gone" />
-
 
                     <Button
                         android:id="@+id/generate_one_time_code_btn"
@@ -168,7 +165,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Family Management"
+                        android:text="User Management"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:textSize="16sp"
@@ -182,6 +179,16 @@
                         android:textColor="@color/white"
                         android:backgroundTint="@color/dark_green"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <Button
+                        android:id="@+id/logout_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Logout"
+                        android:textColor="@color/white"
+                        android:backgroundTint="@color/dark_green"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginTop="8dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

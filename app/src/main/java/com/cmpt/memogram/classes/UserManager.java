@@ -226,18 +226,30 @@ public class UserManager {
                     userUpdate.put("groupID", groupJoinID);
                     userUpdate.put("role", role);
                     db.collection("Users").document(getID())
-                            .set(userUpdate, SetOptions.merge());
-                    // Update group
-                    Map<String, Object> groupUpdate = new HashMap<>();
-                    groupUpdate.put("name", getName());
-                    groupUpdate.put("role", role);
-                    groupUpdate.put("imagePath", userDoc.get("imagePath")).toString();
-                    db.collection("FamilyGroups")
-                            .document(groupJoinID).collection("Members")
-                            .document(getID())
-                            .set(groupUpdate, SetOptions.merge());
-                    db.collection("Invites").document(groupJoinCode.toUpperCase()).delete();
-                    listener.onSuccess();
+                            .set(userUpdate, SetOptions.merge())
+                            .addOnSuccessListener(aVoid -> {
+                                // Update group
+                                Map<String, Object> groupUpdate = new HashMap<>();
+                                groupUpdate.put("name", getName());
+                                groupUpdate.put("role", role);
+                                groupUpdate.put("imagePath", userDoc.get("imagePath").toString());
+                                db.collection("FamilyGroups")
+                                        .document(groupJoinID).collection("Members")
+                                        .document(getID())
+                                        .set(groupUpdate, SetOptions.merge())
+                                        .addOnSuccessListener(aVoid1 -> {
+                                            db.collection("Invites").document(groupJoinCode.toUpperCase()).delete();
+                                            listener.onSuccess();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.d("joinGroup", "Failed to update group members");
+                                            listener.onFailure();
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.d("joinGroup", "Failed to update user");
+                                listener.onFailure();
+                            });
                 } else {
                     Log.d("joinGroup", "No such invite document");
                     listener.onFailure();
@@ -247,7 +259,6 @@ public class UserManager {
                 listener.onFailure();
             }
         });
-
     }
 
     // Leaves group user is currently in
@@ -255,27 +266,30 @@ public class UserManager {
         void onSuccess();
         void onFailure();
     }
+    // UserManager.java
     public void leaveGroup(onLeaveGroupListener listener) {
         // Update group
         db.collection("FamilyGroups")
                 .document(getGroupID()).collection("Members").document(getID())
                 .delete().addOnCompleteListener(delete -> {
-                    if(!delete.isSuccessful()) {
+                    if (!delete.isSuccessful()) {
                         listener.onFailure();
+                        return;
                     }
-                });
 
-        // Update user
-        Map<String, Object> userUpdate = new HashMap<>();
-        userUpdate.put("groupID", "");
-        userUpdate.put("role", "");
-        db.collection("Users").document(getID())
-                .set(userUpdate, SetOptions.merge()).addOnCompleteListener(delete -> {
-                    if(!delete.isSuccessful()) {
-                        listener.onFailure();
-                    }
+                    // Update user
+                    Map<String, Object> userUpdate = new HashMap<>();
+                    userUpdate.put("groupID", "");
+                    userUpdate.put("role", "");
+                    db.collection("Users").document(getID())
+                            .set(userUpdate, SetOptions.merge()).addOnCompleteListener(update -> {
+                                if (!update.isSuccessful()) {
+                                    listener.onFailure();
+                                    return;
+                                }
+                                listener.onSuccess();
+                            });
                 });
-        listener.onSuccess();
     }
 
     // Creates a group
@@ -297,25 +311,53 @@ public class UserManager {
                     group.put("tags", Arrays.asList("none"));
                     db.collection("FamilyGroups")
                             .document(createdGroupID)
-                            .set(group, SetOptions.merge());
-                    joinGroup(createdGroupID, userDoc.get("role").toString(), new onJoinGroupListener() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d("createGroup", "Created and joined");
-                            listener.onSuccess();
-                        }
+                            .set(group, SetOptions.merge())
+                            .addOnSuccessListener(aVoid -> {
+                                // Create an invite code for the new group
+                                createInviteCode(createdGroupID, new onGetInviteCodeListener() {
+                                    @Override
+                                    public void onSuccess(String inviteCode) {
+                                        joinGroup(inviteCode, "admin", new onJoinGroupListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                Log.d("createGroup", "Created and joined");
+                                                listener.onSuccess();
+                                            }
 
-                        @Override
-                        public void onFailure() {
-                            Log.d("createGroup", "Failed");
-                            listener.onFailure();
-                        }
-                    });
+                                            @Override
+                                            public void onFailure() {
+                                                Log.d("createGroup", "Failed to join group");
+                                                listener.onFailure();
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Log.d("createGroup", "Failed to create invite code");
+                                        listener.onFailure();
+                                    }
+                                });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.d("createGroup", "Failed to set group data");
+                                listener.onFailure();
+                            });
                 })
-                .addOnFailureListener(fail -> {
-                    Log.w("Create Group", "Error adding document");
+                .addOnFailureListener(e -> {
+                    Log.w("Create Group", "Error adding document", e);
                     listener.onFailure();
                 });
+    }
+
+    private void createInviteCode(String groupID, onGetInviteCodeListener listener) {
+        String inviteCode = randomCode();
+        Map<String, String> inviteData = new HashMap<>();
+        inviteData.put("groupID", groupID);
+        db.collection("Invites").document(inviteCode)
+                .set(inviteData, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> listener.onSuccess(inviteCode))
+                .addOnFailureListener(e -> listener.onFailure());
     }
 
     // Updates group role

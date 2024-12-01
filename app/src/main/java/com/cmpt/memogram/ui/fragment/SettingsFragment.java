@@ -1,10 +1,8 @@
 package com.cmpt.memogram.ui.fragment;
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.UserManager;
+import com.cmpt.memogram.ui.MainActivity;
 
 public class SettingsFragment extends Fragment {
 
@@ -36,6 +34,7 @@ public class SettingsFragment extends Fragment {
         Button generateOneTimeCodeButton = view.findViewById(R.id.generate_one_time_code_btn);
         TextView oneTimeCodeDisplay = view.findViewById(R.id.one_time_code_display);
         Button leaveFamilyButton = view.findViewById(R.id.leave_family_btn);
+        Button logoutButton = view.findViewById(R.id.logout_btn);
 
         // Set an OnClickListener for the leave family button
         leaveFamilyButton.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +51,7 @@ public class SettingsFragment extends Fragment {
                                 public void onSuccess() {
                                     // Handle success
                                     Toast.makeText(getContext(), "Left the family group successfully.", Toast.LENGTH_SHORT).show();
+                                    navigateToGroupSelection();
                                 }
 
                                 @Override
@@ -70,7 +70,14 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-
+        // Set an OnClickListener for the logout button
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userManager.logout();
+                navigateToLogin();
+            }
+        });
 
         generateOneTimeCodeButton.setOnClickListener(v -> {
             userManager.getInviteCode(new UserManager.onGetInviteCodeListener() {
@@ -98,7 +105,18 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-
         return view;
+    }
+
+    private void navigateToGroupSelection() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new GroupSelectionFragment());
+        transaction.commit();
+    }
+
+    private void navigateToLogin() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new LoginFragment());
+        transaction.commit();
     }
 }
