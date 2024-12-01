@@ -20,6 +20,8 @@ public class LoginFragment extends Fragment {
     private LoginViewModel loginViewModel;
     private boolean isSignUp = false;
 
+    private boolean transacting = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -64,46 +66,54 @@ public class LoginFragment extends Fragment {
         });
 
         submitButton.setOnClickListener(v -> {
-            String email = emailEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
+            if(!transacting) {
+                transacting = true;
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(getContext(), "Email and password cannot be empty", Toast.LENGTH_SHORT).show();
-                return;
-            }
+                String email = emailEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
 
-            if (isSignUp) {
-                String name = nameEditText.getText().toString();
-                String role = roleEditText.getText().toString();
-
-                if (name.isEmpty() || role.isEmpty()) {
-                    Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(getContext(), "Email and password cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                loginViewModel.signUp(email, password, name, role);
+                if (isSignUp) {
+                    String name = nameEditText.getText().toString();
+                    String role = roleEditText.getText().toString();
 
-                loginViewModel.getSignUpSuccess().observe(getViewLifecycleOwner(), result -> {
-                    if (result.first) {
-                        Toast.makeText(getContext(), "Sign-up successful", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Sign-up failed: " + result.second, Toast.LENGTH_SHORT).show();
+                    if (name.isEmpty() || role.isEmpty()) {
+                        Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
+                        transacting = false;
+                        return;
                     }
-                });
-            } else {
-                loginViewModel.setUsername(email);
-                loginViewModel.setPassword(password);
-                loginViewModel.login();
 
-                loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
-                    if (success) {
-                        ((MainActivity) getActivity()).checkGroupStatus();
-                    } else {
-                        Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    loginViewModel.signUp(email, password, name, role);
+
+                    loginViewModel.getSignUpSuccess().observe(getViewLifecycleOwner(), result -> {
+                        if (result.first) {
+                            Toast.makeText(getContext(), "Sign-up successful", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Sign-up failed: " + result.second, Toast.LENGTH_SHORT).show();
+                        }
+                        transacting = false;
+                    });
+                } else {
+                    loginViewModel.setUsername(email);
+                    loginViewModel.setPassword(password);
+                    loginViewModel.login();
+
+                    loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
+                        if (success) {
+                            ((MainActivity) getActivity()).checkGroupStatus();
+                        } else {
+                            Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
+                        }
+                        transacting = false;
+                    });
+                }
             }
         });
+
     }
 
     @Override
