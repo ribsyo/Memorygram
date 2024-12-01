@@ -191,9 +191,9 @@ public class PostFragment extends Fragment {
 
                     // Choose upload method based on audio presence
                     if (hasAudioRecording) {
-                        postManager.uploadPost(title, caption, safeAudioBytes, imageBytes, finalTags, new Date(), uploadListener);
+                        postManager.uploadPost(title, caption, safeAudioBytes, imageBytes, finalTags, selectedDate, uploadListener);
                     } else {
-                        postManager.uploadPost(title, caption, imageBytes, finalTags, new Date(), uploadListener);
+                        postManager.uploadPost(title, caption, imageBytes, finalTags, selectedDate, uploadListener);
                     }
 
                 } else {
