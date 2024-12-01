@@ -42,6 +42,12 @@
     <string name="post_upload_success">Post uploaded successfully.</string>
     <string name="post_upload_fail">Failed to upload post.</string>
 
+    <string name="submit">Submit</string>
+    <string name="one_time_code">one-time code</string>
+    <string name="join_group">Join Group</string>
+    <string name="group_name">Group Name</string>
+    <string name="create_group">Create Group</string>
+
     <string-array name="Roles">
         <item>Son</item>
         <item>Daughter</item>

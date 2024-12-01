@@ -228,7 +228,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                     @Override
                     public void onFailure() {
-                        System.out.println("PostAdapter: Failed to fetch group members");
+
                     }
                 });
 

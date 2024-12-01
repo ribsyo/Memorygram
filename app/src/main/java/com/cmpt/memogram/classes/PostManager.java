@@ -63,7 +63,6 @@ public class PostManager {
                         getMedia(finalPost.imagePath, new OnGetFileListener() {
                             @Override
                             public void onSuccess(String downloadLink) {
-                                System.out.println("got image file");
                                 finalPost.imageDownloadLink = downloadLink;
 
                                 if(finalPost.includeAudio) {
@@ -235,6 +234,7 @@ public class PostManager {
     }
 
     public void getAllPostNamesByDateListed(final OnGetPostNamesListener listener) {
+
         CollectionReference postsCollection = this.db.collection("FamilyGroups").document(this.fg).collection("Posts");
 
         postsCollection.orderBy("dateListed").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -261,7 +261,6 @@ public class PostManager {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     // Handle the success case
-                    System.out.println("Tag added successfully.");
                     // Upload audio file
                     String imageFilePath = fg + "/" + UUID.randomUUID().toString() + "." + "jpeg";
 

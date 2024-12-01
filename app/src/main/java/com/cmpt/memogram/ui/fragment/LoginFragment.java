@@ -97,7 +97,7 @@ public class LoginFragment extends Fragment {
 
                 loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
                     if (success) {
-                        ((MainActivity) getActivity()).createMainContent();
+                        ((MainActivity) getActivity()).checkGroupStatus();
                     } else {
                         Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
                     }

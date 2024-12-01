@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void checkGroupStatus() {
+    public void checkGroupStatus() {
         String groupID = userManager.getGroupID();
         if (groupID == null || groupID.isEmpty()) {
             navigateToGroupSelection();

@@ -482,7 +482,6 @@ public class UserManager {
                     getMedia(member.imagePath, new OnGetFileListener() {
                         @Override
                         public void onSuccess(String downloadLink) {
-                            System.out.println("got image file");
                             member.imageDownloadLink = downloadLink;
                             member.role = document.getData().get("role") != null ?
                                     document.getData().get("role").toString() : "";
