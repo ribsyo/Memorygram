@@ -18,6 +18,7 @@ import com.cmpt.memogram.ui.MainActivity;
 public class LoginFragment extends Fragment {
 
     private LoginViewModel loginViewModel;
+    private boolean isSignUp = false;
 
     @Nullable
     @Override
@@ -42,8 +43,27 @@ public class LoginFragment extends Fragment {
         EditText roleEditText = view.findViewById(R.id.role);
         Button loginButton = view.findViewById(R.id.login_button);
         Button signUpButton = view.findViewById(R.id.sign_up_button);
+        Button submitButton = view.findViewById(R.id.submit_button);
 
         loginButton.setOnClickListener(v -> {
+            isSignUp = false;
+            emailEditText.setVisibility(View.VISIBLE);
+            passwordEditText.setVisibility(View.VISIBLE);
+            nameEditText.setVisibility(View.GONE);
+            roleEditText.setVisibility(View.GONE);
+            submitButton.setVisibility(View.VISIBLE);
+        });
+
+        signUpButton.setOnClickListener(v -> {
+            isSignUp = true;
+            emailEditText.setVisibility(View.VISIBLE);
+            passwordEditText.setVisibility(View.VISIBLE);
+            nameEditText.setVisibility(View.VISIBLE);
+            roleEditText.setVisibility(View.VISIBLE);
+            submitButton.setVisibility(View.VISIBLE);
+        });
+
+        submitButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
 
@@ -51,30 +71,12 @@ public class LoginFragment extends Fragment {
                 Toast.makeText(getContext(), "Email and password cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
-            loginViewModel.setUsername(email);
-            loginViewModel.setPassword(password);
-            loginViewModel.login();
 
-            loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
-                if (success) {
-                    ((MainActivity) getActivity()).createMainContent();
-                } else {
-                    Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-
-        signUpButton.setOnClickListener(v -> {
-            if (nameEditText.getVisibility() == View.GONE || roleEditText.getVisibility() == View.GONE) {
-                nameEditText.setVisibility(View.VISIBLE);
-                roleEditText.setVisibility(View.VISIBLE);
-            } else {
-                String email = emailEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
+            if (isSignUp) {
                 String name = nameEditText.getText().toString();
                 String role = roleEditText.getText().toString();
 
-                if (email.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty()) {
+                if (name.isEmpty() || role.isEmpty()) {
                     Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -86,6 +88,18 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getContext(), "Sign-up successful", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getContext(), "Sign-up failed: " + result.second, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                loginViewModel.setUsername(email);
+                loginViewModel.setPassword(password);
+                loginViewModel.login();
+
+                loginViewModel.getLoginSuccess().observe(getViewLifecycleOwner(), success -> {
+                    if (success) {
+                        ((MainActivity) getActivity()).createMainContent();
+                    } else {
+                        Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

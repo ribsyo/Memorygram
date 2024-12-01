@@ -5,6 +5,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.AppPreferences;
 import com.cmpt.memogram.classes.UserManager;
 import com.cmpt.memogram.ui.fragment.CollectionFragment;
+import com.cmpt.memogram.ui.fragment.GroupSelectionFragment;
 import com.cmpt.memogram.ui.fragment.HomeFragment;
 import com.cmpt.memogram.ui.fragment.LoginFragment;
 import com.cmpt.memogram.ui.fragment.PostFragment;
@@ -42,16 +44,19 @@ public class MainActivity extends AppCompatActivity {
 
         userManager = new UserManager();
         if (userManager.loginStatus()) {
-            // User is logged in, proceed to the main content
-            createMainContent();
+            userManager.getUserDoc(new UserManager.onGetUserDocListener() {
+                @Override
+                public void onSuccess() {
+                    checkGroupStatus();
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    navigateToLogin();
+                }
+            });
         } else {
-            // User is not logged in, show the login fragment
-            if (savedInstanceState == null) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, new LoginFragment());
-                transaction.addToBackStack(null); // Optional: add to back stack to allow user to navigate back
-                transaction.commit();
-            }
+            navigateToLogin();
         }
 
         MaterialButton viewCollectionBtn = findViewById(R.id.view_collection_btn);
@@ -61,6 +66,28 @@ public class MainActivity extends AppCompatActivity {
                 replaceFragment(new CollectionFragment());
             }
         });
+    }
+
+    private void checkGroupStatus() {
+        String groupID = userManager.getGroupID();
+        if (groupID == null || groupID.isEmpty()) {
+            navigateToGroupSelection();
+        } else {
+            createMainContent();
+        }
+    }
+
+    private void navigateToLogin() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new LoginFragment());
+        transaction.addToBackStack(null); // Optional: add to back stack to allow user to navigate back
+        transaction.commit();
+    }
+
+    public void navigateToGroupSelection() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new GroupSelectionFragment());
+        transaction.commit();
     }
 
     public void createMainContent() {
@@ -94,4 +121,18 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    public void leaveGroup() {
+            userManager.leaveGroup(new UserManager.onLeaveGroupListener() {
+                @Override
+                public void onSuccess() {
+                    navigateToGroupSelection();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(MainActivity.this, "Failed to leave group", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 }
