@@ -40,30 +40,42 @@ public class CollectionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_collection, container, false);
 
         userManager = new UserManager();
-        postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), "testGroup", "testUser");
-        recyclerView = view.findViewById(R.id.collection_recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        userManager.getUserDoc(new UserManager.onGetUserDocListener() {
+            @Override
+            public void onSuccess() {
+                postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), userManager.getGroupID(), userManager.getID());
+                recyclerView = view.findViewById(R.id.collection_recycler_view);
+                recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
-        Button sortByUserBtn = view.findViewById(R.id.sort_by_user_btn);
-        Button sortByTagBtn = view.findViewById(R.id.sort_by_tag_btn);
+                Button sortByUserBtn = view.findViewById(R.id.sort_by_user_btn);
+                Button sortByTagBtn = view.findViewById(R.id.sort_by_tag_btn);
 
-        sortByUserBtn.setOnClickListener(v -> fetchAndDisplayGroupMembers());
-        sortByTagBtn.setOnClickListener(v -> fetchAndDisplayTags());
+                sortByUserBtn.setOnClickListener(v -> fetchAndDisplayGroupMembers());
+                sortByTagBtn.setOnClickListener(v -> fetchAndDisplayTags());
 
-        TextView titleTextView = view.findViewById(R.id.view_collection_tutorial_title);
-        TextView descriptionTextView = view.findViewById(R.id.view_collection_tutorial_description);
+                TextView titleTextView = view.findViewById(R.id.view_collection_tutorial_title);
+                TextView descriptionTextView = view.findViewById(R.id.view_collection_tutorial_description);
 
-        titleTextView.setOnClickListener(v -> {
-            if (descriptionTextView.getVisibility() == View.GONE) {
-                descriptionTextView.setVisibility(View.VISIBLE);
-                titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up, 0);
-            } else {
-                descriptionTextView.setVisibility(View.GONE);
-                titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_drop_down, 0);
+                titleTextView.setOnClickListener(v -> {
+                    if (descriptionTextView.getVisibility() == View.GONE) {
+                        descriptionTextView.setVisibility(View.VISIBLE);
+                        titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up, 0);
+                    } else {
+                        descriptionTextView.setVisibility(View.GONE);
+                        titleTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_drop_down, 0);
+                    }
+                });
+
+
+            }
+            @Override
+            public void onFailure(String message) {
+                Log.d("userMan initialize", message);
+
             }
         });
-
         return view;
+
     }
 
     private void fetchAndDisplayGroupMembers() {

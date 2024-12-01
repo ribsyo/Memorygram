@@ -19,6 +19,7 @@ import com.cmpt.memogram.classes.PostManager;
 import com.cmpt.memogram.classes.OnGetPostNamesListener;
 import com.cmpt.memogram.classes.OnGetPostListener;
 import com.cmpt.memogram.adapter.PostAdapter;
+import com.cmpt.memogram.classes.UserManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class CollectionHomeFragment extends Fragment {
     private PostManager postManager;
     private static final String TAG = "CollectionHomeFragment";
 
+    UserManager userManager;
     private static final String ARG_USER_NAME = "userName";
     private String userName;
 
@@ -64,32 +66,47 @@ public class CollectionHomeFragment extends Fragment {
 
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this::refreshPosts);
+        userManager = new UserManager();
 
-        postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), "alexGroup", "testUser");
+        userManager.getUserDoc(
+                new UserManager.onGetUserDocListener() {
+                    @Override
+                    public void onSuccess() {
+                        postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), userManager.getGroupID(), userManager.getID());
 
-        // Retrieve the arguments passed and use them to filter posts
-        Bundle args = getArguments();
-        if (args != null) {
-            String filterType = args.getString("filterType");
-            String filterValue = args.getString("filterValue");
-            String tagName = args.getString("tagName");
+                        // Retrieve the arguments passed and use them to filter posts
+                        Bundle args = getArguments();
+                        if (args != null) {
+                            String filterType = args.getString("filterType");
+                            String filterValue = args.getString("filterValue");
+                            String tagName = args.getString("tagName");
 
-            // Set the sorting information
-            TextView sortingInfoTextView = view.findViewById(R.id.collection_home_title);
-            if ("tag".equals(filterType)) {
-                sortingInfoTextView.setText("SORTED BY TAG");
-                filterPostsByTag(filterValue);
-            } else if ("user".equals(filterType)) {
-                sortingInfoTextView.setText("SORTED BY USER");
-                filterPostsByUserName(filterValue);
-            }
-        }
+                            // Set the sorting information
+                            TextView sortingInfoTextView = view.findViewById(R.id.collection_home_title);
+                            if ("tag".equals(filterType)) {
+                                sortingInfoTextView.setText("SORTED BY TAG");
+                                filterPostsByTag(filterValue);
+                            } else if ("user".equals(filterType)) {
+                                sortingInfoTextView.setText("SORTED BY USER");
+                                filterPostsByUserName(filterValue);
+                            }
+                        }
 
-        ImageView forwardBtn = view.findViewById(R.id.forward_btn);
-        forwardBtn.setOnClickListener(v -> {
-            // Navigate back to CollectionViewFragment
-            getParentFragmentManager().popBackStack();
-        });
+                        ImageView forwardBtn = view.findViewById(R.id.forward_btn);
+                        forwardBtn.setOnClickListener(v -> {
+                            // Navigate back to CollectionViewFragment
+                            getParentFragmentManager().popBackStack();
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+
+                    }
+                }
+        );
+
+
 
         return view;
     }

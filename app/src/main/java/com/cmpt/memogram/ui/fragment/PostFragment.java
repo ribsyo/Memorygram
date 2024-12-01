@@ -62,12 +62,14 @@ public class PostFragment extends Fragment {
     private Button datePickerButton;
     private Date selectedDate;
 
+    UserManager userManager;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_post, container, false);
-
+        userManager = new UserManager();
         imageButton = view.findViewById(R.id.imageButton);
         captionEditText = view.findViewById(R.id.AddCaption);
         tagsEditText = view.findViewById(R.id.AddTags);
@@ -159,8 +161,8 @@ public class PostFragment extends Fragment {
 
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     FirebaseStorage fs = FirebaseStorage.getInstance();
-                    UserManager userManager = new UserManager();
-                    PostManager postManager = new PostManager(db, fs, "alexGroup", userManager.getID());
+
+                    PostManager postManager = new PostManager(db, fs, userManager.getGroupID(), userManager.getID());
                     OnUploadPostListener uploadListener = new OnUploadPostListener() {
                         @Override
                         public void onSuccess() {

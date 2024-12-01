@@ -150,7 +150,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             profileImageView = itemView.findViewById(R.id.profile_image);
             tagTextView = itemView.findViewById(R.id.tag);
             postContainer = itemView.findViewById(R.id.post_container);
-            postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), "alexGroup", userManager.getID());
+            postManager = new PostManager(FirebaseFirestore.getInstance(), FirebaseStorage.getInstance(), userManager.getGroupID(), userManager.getID());
         }
 
         private void bind(Post post, long lastLaunchTimestamp, long currentSessionTimestamp) {

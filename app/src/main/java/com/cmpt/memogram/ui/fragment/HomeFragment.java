@@ -16,6 +16,7 @@ import com.cmpt.memogram.classes.OnGetPostListener;
 import com.cmpt.memogram.classes.OnGetPostNamesListener;
 import com.cmpt.memogram.classes.Post;
 import com.cmpt.memogram.classes.PostManager;
+import com.cmpt.memogram.classes.UserManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -28,11 +29,17 @@ public class HomeFragment extends Fragment {
     private PostAdapter postAdapter;
     private List<Post> postLists;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private UserManager userManager;
+    private PostManager postManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseStorage fs = FirebaseStorage.getInstance();
+        userManager = new UserManager();
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -57,15 +64,30 @@ public class HomeFragment extends Fragment {
         scrollToTopBtn.setOnClickListener(v -> recyclerView.smoothScrollToPosition(0));
         scrollToBottomBtn.setOnClickListener(v -> recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1));
 
-        refreshPosts();
+        userManager.getUserDoc(
+                new UserManager.onGetUserDocListener() {
+                    @Override
+                    public void onSuccess() {
+                        postManager = new PostManager(db, fs, userManager.getGroupID(), userManager.getID());
+
+
+                        refreshPosts();
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+
+                    }
+                }
+        );
+
 
         return view;
     }
 
     public void refreshPosts() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseStorage fs = FirebaseStorage.getInstance();
-        PostManager postManager = new PostManager(db, fs, "alexGroup", "testUser");
+
+
 
         postLists.clear();
         postManager.getAllPostNamesByDateListed(new OnGetPostNamesListener() {
