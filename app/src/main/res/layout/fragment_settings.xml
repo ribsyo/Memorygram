@@ -79,15 +79,6 @@
                         android:textSize="16sp"
                         android:layout_marginBottom="8dp"/>
 
-                    <Button
-                        android:id="@+id/join_group_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Join Group"
-                        android:textColor="@color/white"
-                        android:backgroundTint="@color/dark_green"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
                     <EditText
                         android:id="@+id/one_time_code_input"
                         android:layout_width="350dp"
@@ -182,15 +173,6 @@
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:layout_marginBottom="8dp"/>
-
-                    <Button
-                        android:id="@+id/manage_family_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Manage Family"
-                        android:textColor="@color/white"
-                        android:backgroundTint="@color/dark_green"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
                     <Button
                         android:id="@+id/leave_family_btn"

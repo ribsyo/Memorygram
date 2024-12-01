@@ -31,14 +31,14 @@ import com.google.firebase.storage.StorageReference;
 
 public class PostManager {
     private String fg = "alexGroup";
-    private String userID = "";
+    private String userID = "testUser";
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private StorageReference sr;
 
     public PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg, String userID) {
         this.db = db;
-        this.fg = "alexGroup";
+        this.fg = fg;
         this.fs = fs;
         this.userID = userID;
         this.sr = this.fs.getReference();
@@ -57,7 +57,7 @@ public class PostManager {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         post = toPost(document);
-                        post.postID = document.getId();
+
                         Post finalPost = post;
                         //get image
                         getMedia(finalPost.imagePath, new OnGetFileListener() {
@@ -123,6 +123,7 @@ public class PostManager {
         post.posterID = (String) dr.get("posterID");
         post.tag = (String) dr.get("tag");
         post.includeAudio = (boolean) dr.get("includeAudio");
+        post.postID = (String) dr.get("postID");
         return post;
     }
 
@@ -284,11 +285,15 @@ public class PostManager {
                                     newPost.datePosted = new Date();
                                     newPost.dateListed = dateListed;
                                     newPost.tag = tag;
+
                                     // Save post to Firestore
                                     db.collection("FamilyGroups").document(fg).collection("Posts")
                                             .add(newPost)
                                             .addOnSuccessListener(documentReference -> {
-                                                listener.onSuccess();
+                                                String postID = documentReference.getId();
+                                                documentReference.update("postID", postID)
+                                                        .addOnSuccessListener(aVoid -> listener.onSuccess())
+                                                        .addOnFailureListener(e -> listener.onFailure());
                                             })
                                             .addOnFailureListener(e -> {
                                                 listener.onFailure();
@@ -353,7 +358,10 @@ public class PostManager {
                                                     db.collection("FamilyGroups").document(fg).collection("Posts")
                                                             .add(newPost)
                                                             .addOnSuccessListener(documentReference -> {
-                                                                listener.onSuccess();
+                                                                String postID = documentReference.getId();
+                                                                documentReference.update("postID", postID)
+                                                                        .addOnSuccessListener(aVoid -> listener.onSuccess())
+                                                                        .addOnFailureListener(e -> listener.onFailure());
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 listener.onFailure();
@@ -379,36 +387,7 @@ public class PostManager {
 
 
     }
-    private void checkAndRemoveTag(String tag, final OnDeletePostListener listener) {
-        CollectionReference postsRef = FirebaseFirestore.getInstance().collection("FamilyGroups").document(this.fg).collection("Posts");
 
-        postsRef.whereEqualTo("tag", tag).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    if (task.getResult().isEmpty()) {
-                        // No posts with the same tag, remove the tag from FamilyGroup
-                        DocumentReference familyGroupRef = FirebaseFirestore.getInstance().collection("FamilyGroups").document(fg);
-                        familyGroupRef.update("tags", FieldValue.arrayRemove(tag))
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> removeTagTask) {
-                                        if (removeTagTask.isSuccessful()) {
-                                            listener.onSuccess();
-                                        } else {
-                                            listener.onFailure(removeTagTask.getException());
-                                        }
-                                    }
-                                });
-                    } else {
-                        listener.onSuccess();
-                    }
-                } else {
-                    listener.onFailure(task.getException());
-                }
-            }
-        });
-    }
 
     //deletes Post from database
     public void deletePost(String postName, final OnDeletePostListener listener) {
@@ -472,6 +451,37 @@ public class PostManager {
                             }
                         }
                     });
+                } else {
+                    listener.onFailure(task.getException());
+                }
+            }
+        });
+    }
+
+    private void checkAndRemoveTag(String tag, final OnDeletePostListener listener) {
+        CollectionReference postsRef = FirebaseFirestore.getInstance().collection("FamilyGroups").document(this.fg).collection("Posts");
+
+        postsRef.whereEqualTo("tag", tag).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    if (task.getResult().isEmpty()) {
+                        // No posts with the same tag, remove the tag from FamilyGroup
+                        DocumentReference familyGroupRef = FirebaseFirestore.getInstance().collection("FamilyGroups").document(fg);
+                        familyGroupRef.update("tags", FieldValue.arrayRemove(tag))
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> removeTagTask) {
+                                        if (removeTagTask.isSuccessful()) {
+                                            listener.onSuccess();
+                                        } else {
+                                            listener.onFailure(removeTagTask.getException());
+                                        }
+                                    }
+                                });
+                    } else {
+                        listener.onSuccess();
+                    }
                 } else {
                     listener.onFailure(task.getException());
                 }
