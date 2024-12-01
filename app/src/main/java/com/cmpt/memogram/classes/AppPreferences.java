@@ -13,9 +13,9 @@ public class AppPreferences {
 
     public static void setPostViewed(Context context, String postId) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Set<String> viewedPosts = prefs.getStringSet(VIEWED_POSTS_KEY, new HashSet<>());
+        Set<String> viewedPosts = new HashSet<>(prefs.getStringSet(VIEWED_POSTS_KEY, new HashSet<>()));
         viewedPosts.add(postId);
+        SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet(VIEWED_POSTS_KEY, viewedPosts);
         editor.apply();
     }
