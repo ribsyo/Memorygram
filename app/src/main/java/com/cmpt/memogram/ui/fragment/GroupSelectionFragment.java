@@ -107,6 +107,6 @@ public class GroupSelectionFragment extends Fragment {
     }
 
     private void navigateToMainContent() {
-        ((MainActivity) getActivity()).checkGroupStatus();
+        ((MainActivity) getActivity()).createMainContent();
     }
 }
