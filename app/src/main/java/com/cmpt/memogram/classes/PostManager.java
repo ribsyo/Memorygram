@@ -38,7 +38,7 @@ public class PostManager {
 
     public PostManager(FirebaseFirestore db, FirebaseStorage fs, String fg, String userID) {
         this.db = db;
-        this.fg = "alexGroup";
+        this.fg = fg;
         this.fs = fs;
         this.userID = userID;
         this.sr = this.fs.getReference();
