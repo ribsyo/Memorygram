@@ -32,10 +32,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(UserViewHolder holder, int position) {
         User user = users.get(position);
         holder.userName.setText(user.name);
+        holder.userRole.setText(user.role);
         Glide.with(holder.itemView.getContext())
                 .load(user.imageDownloadLink)
-                .placeholder(R.mipmap.cat) // Optional placeholder image
                 .into(holder.userImageBtn);
+
+        // Set click listener on the CircleImageView
+        holder.userImageBtn.setOnClickListener(v -> fragment.openCollectionHomeFragment("user", user.ID));
+
+        // Optionally, set click listener on the entire item view if needed
         holder.itemView.setOnClickListener(v -> fragment.openCollectionHomeFragment("user", user.ID));
     }
 
@@ -46,11 +51,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView userName;
+        TextView userRole;
         CircleImageView userImageBtn;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.user_name);
+            userRole = itemView.findViewById(R.id.role);
             userImageBtn = itemView.findViewById(R.id.user_image_btn);
         }
     }

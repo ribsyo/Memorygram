@@ -1,8 +1,7 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/dark_green"
     android:layout_marginTop="65dp">
 
@@ -13,7 +12,8 @@
         android:background="@color/yellow"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        android:id="@+id/tutorial_layout">
 
         <TextView
             android:id="@+id/view_collection_tutorial_title"
@@ -44,35 +44,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp">
+        android:layout_below="@id/tutorial_layout"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:id="@+id/button_layout">
 
         <Button
             android:id="@+id/sort_by_user_btn"
-            android:layout_width="175dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_weight="1"
             android:layout_marginEnd="10dp"
             android:text="SORT BY USER"
             android:backgroundTint="@color/blue"
-            android:drawableLeft="@drawable/ic_role"/>
+            android:drawableLeft="@drawable/ic_role"
+            android:textColor="@color/white"/>
 
         <Button
             android:id="@+id/sort_by_tag_btn"
-            android:layout_width="175dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="20dp"
             android:text="SORT BY TAG"
             android:backgroundTint="@color/blue"
-            android:drawableLeft="@drawable/ic_hashtag"/>
+            android:drawableLeft="@drawable/ic_hashtag"
+            android:textColor="@color/white"/>
 
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/collection_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_below="@id/button_layout"
         android:layout_marginTop="20dp"/>
 
-</LinearLayout>
+</RelativeLayout>

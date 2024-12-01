@@ -3,6 +3,7 @@ package com.cmpt.memogram.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cmpt.memogram.R;
@@ -29,7 +30,8 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
     public void onBindViewHolder(TagViewHolder holder, int position) {
         String tag = tags.get(position);
         holder.tagName.setText(tag);
-        holder.itemView.setOnClickListener(v -> fragment.openCollectionHomeFragment("tag", tag));    }
+        holder.tagButton.setOnClickListener(v -> fragment.openCollectionHomeFragment("tag", tag));
+    }
 
     @Override
     public int getItemCount() {
@@ -38,10 +40,12 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
 
     public static class TagViewHolder extends RecyclerView.ViewHolder {
         TextView tagName;
+        ImageButton tagButton;
 
         public TagViewHolder(View itemView) {
             super(itemView);
             tagName = itemView.findViewById(R.id.tag_name);
+            tagButton = itemView.findViewById(R.id.tag_btn);
         }
     }
 }

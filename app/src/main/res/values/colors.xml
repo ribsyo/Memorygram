@@ -20,4 +20,7 @@
     <color name="light_black">#F2F2F2</color>
     <color name="sage">#a1a79e</color>
 
+    <color name="highlight_color">#7EFFFF00</color>
+    <color name="default_color">#384c37</color>
+
 </resources>
