@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import com.cmpt.memogram.R;
 import com.cmpt.memogram.classes.UserManager;
 import com.cmpt.memogram.ui.MainActivity;
@@ -33,6 +34,7 @@ public class GroupSelectionFragment extends Fragment {
         Button joinGroupButton = view.findViewById(R.id.join_group_btn);
         Button createGroupButton = view.findViewById(R.id.create_group_btn);
         Button submitButton = view.findViewById(R.id.submit_btn);
+        Button logoutButton = view.findViewById(R.id.logout_button);
         ConstraintLayout constraintLayout = view.findViewById(R.id.constraint_layout);
 
         joinGroupButton.setOnClickListener(v -> {
@@ -101,6 +103,12 @@ public class GroupSelectionFragment extends Fragment {
                     }
                 });
             }
+        });
+
+        logoutButton.setOnClickListener(v -> {
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, new LoginFragment());
+            transaction.commit();
         });
 
         return view;

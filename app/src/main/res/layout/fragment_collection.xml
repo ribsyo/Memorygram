@@ -19,7 +19,7 @@
             android:id="@+id/view_collection_tutorial_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is where you can view collections! Press here to learn more."
+            android:text="@string/view_collection_drop"
             android:textSize="14sp"
             android:textColor="@color/black"
             android:fontFamily="@font/nunito"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/view_collection_tutorial_title"
             android:layout_marginTop="8dp"
-            android:text="Firstly, select a collection to view. Then, you can sort the collection by user or tag. Press the buttons below to sort the collection."
+            android:text="@string/view_collection_more_drop"
             android:textSize="12sp"
             android:textColor="@color/black"
             android:fontFamily="@font/ptsans"
@@ -51,23 +51,29 @@
         android:id="@+id/button_layout">
 
         <Button
+            android:letterSpacing="0.2"
             android:id="@+id/sort_by_user_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="10dp"
-            android:text="SORT BY USER"
+            android:text="@string/sort_by_user"
+            android:textAllCaps="true"
+            android:textSize="13sp"
             android:backgroundTint="@color/blue"
             android:drawableLeft="@drawable/ic_role"
             android:textColor="@color/white"/>
 
         <Button
+            android:letterSpacing="0.2"
             android:id="@+id/sort_by_tag_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="10dp"
-            android:text="SORT BY TAG"
+            android:text="@string/sort_by_tag"
+            android:textAllCaps="true"
+            android:textSize="13sp"
             android:backgroundTint="@color/blue"
             android:drawableLeft="@drawable/ic_hashtag"
             android:textColor="@color/white"/>
