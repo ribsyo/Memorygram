@@ -42,7 +42,7 @@ public class GroupSelectionFragment extends Fragment {
             oneTimeCodeInput.setVisibility(View.VISIBLE);
             groupNameInput.setVisibility(View.GONE);
             submitButton.setVisibility(View.VISIBLE);
-            submitButton.setText("Join Group");
+            submitButton.setText("Submit");
 
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(constraintLayout);
@@ -55,7 +55,7 @@ public class GroupSelectionFragment extends Fragment {
             groupNameInput.setVisibility(View.VISIBLE);
             oneTimeCodeInput.setVisibility(View.GONE);
             submitButton.setVisibility(View.VISIBLE);
-            submitButton.setText("Create Group");
+            submitButton.setText("Submit");
 
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(constraintLayout);

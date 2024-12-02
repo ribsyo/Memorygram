@@ -34,14 +34,10 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
         View viewLine = getActivity().findViewById(R.id.view_line);
         if (viewLine != null) {
             viewLine.setVisibility(View.GONE);
         }
-
-
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
@@ -77,7 +73,7 @@ public class LoginFragment extends Fragment {
         });
 
         submitButton.setOnClickListener(v -> {
-            if(!transacting) {
+            if (!transacting) {
                 transacting = true;
 
                 String email = emailEditText.getText().toString();
@@ -85,6 +81,7 @@ public class LoginFragment extends Fragment {
 
                 if (email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(getContext(), "Email and password cannot be empty", Toast.LENGTH_SHORT).show();
+                    transacting = false;
                     return;
                 }
 
@@ -124,7 +121,6 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
-
     }
 
     @Override
@@ -136,5 +132,6 @@ public class LoginFragment extends Fragment {
         if (viewLine != null) {
             viewLine.setVisibility(View.VISIBLE);
         }
+
     }
 }
