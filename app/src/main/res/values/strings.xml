@@ -66,6 +66,7 @@
     <string name="enter_one_time_code">Enter One-Time Code</string>
     <string name="profile_settings">Profile Settings</string>
     <string name="user_management">User Management</string>
+    <string name="delete">Delete</string>
 
     <string name="home_drop">Welcome to Memogram! Press here to learn the basics.</string>
     <string name="home_more_drop">This is the home screen. Here, you can view posts from your family members. Each posts can contain voice recording and or a description. Highlighted posts are posts that you have not viewed. Please press on them to indicate that you have viewed the post. You may also press the view collections button locate in the top right of the screen to filter through posts.</string>
