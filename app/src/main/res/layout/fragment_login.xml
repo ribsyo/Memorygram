@@ -133,7 +133,7 @@
         android:fontFamily="@font/ptsans"/>
 
     <!-- Role input -->
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/role"
         android:layout_width="275dp"
         android:layout_height="wrap_content"

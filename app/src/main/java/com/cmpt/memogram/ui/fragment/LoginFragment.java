@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -32,27 +34,36 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+
         View viewLine = getActivity().findViewById(R.id.view_line);
         if (viewLine != null) {
             viewLine.setVisibility(View.GONE);
         }
+
+
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         EditText emailEditText = view.findViewById(R.id.username);
         EditText passwordEditText = view.findViewById(R.id.password);
         EditText nameEditText = view.findViewById(R.id.name);
-        EditText roleEditText = view.findViewById(R.id.role);
+        AutoCompleteTextView roleDropdown = view.findViewById(R.id.role);
         Button loginButton = view.findViewById(R.id.login_button);
         Button signUpButton = view.findViewById(R.id.sign_up_button);
         Button submitButton = view.findViewById(R.id.submit_button);
+
+        String[] roles = getResources().getStringArray(R.array.Roles);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, R.id.textView, roles);
+        roleDropdown.setAdapter(adapter);
+        roleDropdown.setThreshold(1);
 
         loginButton.setOnClickListener(v -> {
             isSignUp = false;
             emailEditText.setVisibility(View.VISIBLE);
             passwordEditText.setVisibility(View.VISIBLE);
             nameEditText.setVisibility(View.GONE);
-            roleEditText.setVisibility(View.GONE);
+            roleDropdown.setVisibility(View.GONE);
             submitButton.setVisibility(View.VISIBLE);
         });
 
@@ -61,7 +72,7 @@ public class LoginFragment extends Fragment {
             emailEditText.setVisibility(View.VISIBLE);
             passwordEditText.setVisibility(View.VISIBLE);
             nameEditText.setVisibility(View.VISIBLE);
-            roleEditText.setVisibility(View.VISIBLE);
+            roleDropdown.setVisibility(View.VISIBLE);
             submitButton.setVisibility(View.VISIBLE);
         });
 
@@ -79,7 +90,7 @@ public class LoginFragment extends Fragment {
 
                 if (isSignUp) {
                     String name = nameEditText.getText().toString();
-                    String role = roleEditText.getText().toString();
+                    String role = roleDropdown.getText().toString();
 
                     if (name.isEmpty() || role.isEmpty()) {
                         Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();

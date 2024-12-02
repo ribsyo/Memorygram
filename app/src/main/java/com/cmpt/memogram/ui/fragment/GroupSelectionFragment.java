@@ -106,6 +106,7 @@ public class GroupSelectionFragment extends Fragment {
         });
 
         logoutButton.setOnClickListener(v -> {
+            userManager.logout();
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, new LoginFragment());
             transaction.commit();
